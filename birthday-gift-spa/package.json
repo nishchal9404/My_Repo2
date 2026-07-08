@@ -1,0 +1,31 @@
+{
+  "name": "birthday-gift-spa",
+  "version": "1.0.0",
+  "description": "A highly interactive single-page web application for presenting digital birthday gifts.",
+  "main": "src/main.jsx",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "tailwindcss": "^3.0.0",
+    "postcss": "^8.0.0",
+    "vite": "^5.0.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.0.0",
+    "@vitejs/plugin-react": "^4.0.0"
+  },
+  "keywords": [
+    "birthday",
+    "gift",
+    "spa",
+    "react",
+    "tailwindcss"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

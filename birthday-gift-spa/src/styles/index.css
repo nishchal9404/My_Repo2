@@ -1,0 +1,336 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Georgia', serif;
+    background-color: #fce4ec;
+  }
+}
+
+@layer components {
+  .bg-crimson { background-color: #fce4ec; }
+  .text-crimson { color: #fce4ec; }
+
+  /* Buttons */
+  .btn-primary {
+    @apply bg-crimson text-white font-bold py-3 px-8 rounded-full shadow-lg
+           hover:bg-red-700 active:scale-95 transition-all duration-200 tracking-widest text-sm;
+  }
+  .btn-secondary {
+    @apply bg-white/20 text-white border border-white/40 py-2 px-6 rounded-full
+           hover:bg-white/30 active:scale-95 transition-all duration-200 text-sm;
+  }
+  .keypad-btn {
+    @apply w-16 h-16 rounded-full bg-white/20 text-white text-xl font-semibold
+           border border-white/30 hover:bg-white/30 active:scale-90 transition-all duration-150;
+  }
+
+  /* Gift cards */
+  .gift-card {
+    @apply flex flex-col items-center bg-white/15 border border-white/30 rounded-2xl
+           p-6 w-36 hover:bg-white/25 active:scale-95 transition-all duration-200 cursor-pointer;
+  }
+
+  /* Polaroid */
+  .polaroid {
+    @apply bg-white p-2 pb-6 shadow-xl rounded-sm;
+  }
+
+  /* Envelope */
+  .envelope {
+    @apply relative w-48 h-32 bg-pink-100 rounded-lg shadow-2xl flex items-center justify-center overflow-hidden;
+  }
+  .envelope-flap {
+    @apply absolute top-0 left-0 w-full h-1/2 bg-pink-200 rounded-t-lg;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+  .envelope-body {
+    @apply flex items-center justify-center w-full h-full;
+  }
+
+  /* Letter paper */
+  .letter-paper {
+    @apply bg-amber-50 rounded-2xl p-6 shadow-2xl border border-amber-200;
+  }
+
+  /* Cake & candle */
+  .cake {
+    @apply flex flex-col items-center;
+  }
+  .cake-top {
+    @apply text-8xl;
+  }
+  .candle {
+    @apply relative flex flex-col items-center mb-1;
+  }
+  .flame {
+    @apply w-5 h-8 flex items-center justify-center;
+    animation: flicker 0.3s infinite alternate;
+  }
+  .flame-inner {
+    @apply w-4 h-7 rounded-full bg-gradient-to-t from-orange-500 via-yellow-400 to-yellow-200;
+    border-radius: 50% 50% 30% 30%;
+  }
+  .smoke {
+    @apply w-1 h-8 bg-gray-300/60 rounded-full;
+    animation: rise 1s ease-out forwards;
+  }
+}
+
+/* Confetti */
+.confetti-container {
+  @apply absolute inset-0 overflow-hidden pointer-events-none;
+}
+.confetti-piece {
+  @apply absolute w-2 h-3 opacity-80;
+  top: -10px;
+  animation: fall 3s linear infinite;
+  border-radius: 2px;
+}
+
+/* Keyframe animations */
+@keyframes fall {
+  0%   { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes flicker {
+  0%   { transform: scaleX(1) scaleY(1) rotate(-2deg); }
+  100% { transform: scaleX(0.9) scaleY(1.05) rotate(2deg); }
+}
+
+@keyframes rise {
+  0%   { transform: translateY(0) scaleX(1); opacity: 0.6; }
+  100% { transform: translateY(-40px) scaleX(2); opacity: 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX(8px); }
+  60%       { transform: translateX(-6px); }
+  80%       { transform: translateX(6px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-5deg); }
+  50%       { transform: rotate(5deg); }
+}
+
+@keyframes bounceSlow {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-16px); }
+}
+
+.animate-float        { animation: float 2s ease-in-out infinite; }
+.animate-shake        { animation: shake 0.5s ease-in-out; }
+.animate-fade-in      { animation: fadeIn 0.6s ease-out forwards; }
+.animate-wiggle       { animation: wiggle 0.4s ease-in-out; }
+.animate-bounce-slow  { animation: bounceSlow 2s ease-in-out infinite; }
+
+/* Fairy Lights */
+.fairy-lights-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding: 0 4px;
+  z-index: 40;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, transparent 100%);
+}
+.fairy-bulb {
+  display: inline-block;
+  width: 10px;
+  height: 14px;
+  border-radius: 50% 50% 40% 40%;
+  background: #ffe066;
+  box-shadow: 0 0 8px 4px #ffe066, 0 0 18px 6px #ffb300;
+  margin-top: 6px;
+  animation: bulbFlicker 1.4s ease-in-out infinite alternate;
+}
+@keyframes bulbFlicker {
+  0%   { opacity: 1;   box-shadow: 0 0 8px 4px #ffe066, 0 0 18px 6px #ffb300; }
+  40%  { opacity: 0.6; box-shadow: 0 0 4px 2px #ffe066, 0 0 8px 3px #ffb300; }
+  100% { opacity: 1;   box-shadow: 0 0 12px 6px #ffe066, 0 0 24px 8px #ff8c00; }
+}
+
+/* Balloons */
+.balloons-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 30;
+  overflow: hidden;
+}
+.balloon {
+  position: absolute;
+  bottom: -80px;
+  width: var(--bsize);
+  height: calc(var(--bsize) * 1.25);
+  background: var(--bcolor);
+  border-radius: 50% 50% 45% 45%;
+  box-shadow: inset -6px -6px 12px rgba(0,0,0,0.15), 0 0 12px rgba(255,255,255,0.1);
+  animation: balloonRise 5s ease-in forwards;
+}
+.balloon::after {
+  content: '';
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 14px;
+  background: rgba(255,255,255,0.5);
+}
+@keyframes balloonRise {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(-110vh) rotate(8deg); opacity: 0; }
+}
+
+/* Theater Curtain */
+.curtain-half {
+  width: 50%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    to bottom,
+    #8b0000 0px,
+    #a00000 18px,
+    #6b0000 36px
+  );
+  transition: transform 1.1s cubic-bezier(0.77,0,0.18,1);
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.4);
+}
+.curtain-left  { border-right: 3px solid #ffd700; }
+.curtain-right { border-left:  3px solid #ffd700; }
+
+/* Cake cut line flash */
+.cake-cut-line {
+  animation: cutFlash 0.45s ease-out forwards;
+}
+@keyframes cutFlash {
+  0%   { opacity: 0; transform: scaleY(0); transform-origin: top; }
+  40%  { opacity: 1; transform: scaleY(1); }
+  100% { opacity: 0; transform: scaleY(1); }
+}
+
+/* Confetti burst from cake center */
+.cake-confetti {
+  position: absolute;
+  animation: confettiBurst 0.9s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+@keyframes confettiBurst {
+  0%   { transform: rotate(var(--angle)) translateX(0)   scale(0); opacity: 1; }
+  70%  { opacity: 1; }
+  100% { transform: rotate(var(--angle)) translateX(var(--dist)) scale(1); opacity: 0; }
+}
+
+/* Happy Birthday text pop */
+.hb-text {
+  font-family: Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 0 18px #f472b6, 0 0 32px #a78bfa, 0 2px 0 rgba(0,0,0,0.3);
+  white-space: nowrap;
+  animation: hbPop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  letter-spacing: 0.04em;
+}
+@keyframes hbPop {
+  0%   { transform: scale(0) translateY(20px); opacity: 0; }
+  60%  { transform: scale(1.15) translateY(-4px); opacity: 1; }
+  100% { transform: scale(1) translateY(0);     opacity: 1; }
+}
+
+@keyframes hbGlow {
+  0%   { transform: translate(-50%,-50%) scale(0); opacity: 0; }
+  50%  { opacity: 1; }
+  100% { transform: translate(-50%,-50%) scale(1.6); opacity: 0; }
+}
+
+/* Photo string sway */
+@keyframes photoSway {
+  0%   { transform: rotate(var(--rot, -4deg)); }
+  100% { transform: rotate(calc(var(--rot, -4deg) * -1)); }
+}
+
+/* Warm light pulse for rope lights */
+@keyframes lightPulse {
+  0%, 100% { 
+    opacity: 0.7;
+    filter: brightness(1);
+  }
+  50% { 
+    opacity: 1;
+    filter: brightness(1.3);
+  }
+}
+
+/* Camera flash effect */
+@keyframes flash {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Photo eject animation */
+@keyframes photoEject {
+  0% {
+    transform: translateX(-50%) translateY(0) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(-50%) translateY(-30px) scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(-60px) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Photo appear animation */
+@keyframes photoAppear {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1) rotate(5deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(var(--rot, 0deg));
+    opacity: 1;
+  }
+}
+
+.animate-flash {
+  animation: flash 0.3s ease-out forwards;
+}
+
+.animate-photoEject {
+  animation: photoEject 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-photoAppear {
+  animation: photoAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
