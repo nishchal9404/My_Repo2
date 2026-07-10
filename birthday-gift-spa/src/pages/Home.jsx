@@ -98,24 +98,31 @@ const PasscodeLock = ({ onUnlock }) => {
   );
 };
 
-// ── Intro Modal (3 screens) ────────────────────────────────────────────────────
-const INTRO_STEPS = [
-  { text: "It's Your Special Day", btn: 'NEXT' },
-  { text: 'Have a look at it...', btn: 'NEXT' },
-  { text: 'Ready for your surprise?', btn: "LET'S GO" },
+// ── Intro Modal (2 cards, auto-advance) ────────────────────────────────────────
+const INTRO_TEXTS = [
+  "It's Your Special Day",
+  'Have a look at it...',
 ];
 
 const IntroModal = ({ onDone }) => {
   const [step, setStep] = useState(0);
   const [visible, setVisible] = useState(true);
 
-  const advance = () => {
-    setVisible(false);
-    setTimeout(() => {
-      if (step < INTRO_STEPS.length - 1) { setStep(s => s + 1); setVisible(true); }
-      else onDone();
-    }, 400);
-  };
+  // Auto-advance cards after 1 second each, then call onDone
+  useEffect(() => {
+    const t1 = setTimeout(() => {
+      setVisible(false);
+      setTimeout(() => {
+        if (step < INTRO_TEXTS.length - 1) {
+          setStep(s => s + 1);
+          setVisible(true);
+        } else {
+          onDone();
+        }
+      }, 400);
+    }, 1000);
+    return () => clearTimeout(t1);
+  }, [step, onDone]);
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#1a0010 0%,#3d0030 60%,#1a0010 100%)' }}>
@@ -128,20 +135,13 @@ const IntroModal = ({ onDone }) => {
           className={`text-white text-center text-2xl font-semibold tracking-wide transition-all duration-400 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
           style={{ fontFamily: 'Georgia, serif', lineHeight: 1.4 }}
         >
-          {INTRO_STEPS[step].text}
+          {INTRO_TEXTS[step]}
         </p>
         <div className="flex gap-2 mt-2">
-          {INTRO_STEPS.map((_, i) => (
+          {INTRO_TEXTS.map((_, i) => (
             <div key={i} className="w-2 h-2 rounded-full transition-all duration-300" style={{ background: i === step ? '#f9a8c9' : 'rgba(255,255,255,0.25)' }} />
           ))}
         </div>
-        <button
-          onClick={advance}
-          className="mt-2 px-10 py-3 rounded-full font-bold tracking-widest text-sm transition-all duration-200 hover:scale-105 active:scale-95"
-          style={{ background: 'linear-gradient(90deg,#e91e8c,#ff6b9d)', color: '#fff', boxShadow: '0 4px 24px rgba(233,30,140,0.35)' }}
-        >
-          {INTRO_STEPS[step].btn}
-        </button>
       </div>
     </div>
   );
@@ -177,16 +177,50 @@ const Balloons = () => (
   </div>
 );
 
-const StagePrep = ({ onCurtain }) => {
+const StagePrep = ({ onCurtain, bgAudioRef }) => {
   const [step, setStep] = useState(0);
   const [done, setDone] = useState([]);
   const [visible, setVisible] = useState(true);
-  const audioRef = useRef(null);
+  const bgSongs = [
+    '/songs/Lord_Huron_-_The_Night_We_Met__Official_Audio_(256k).mp3',
+    '/songs/Stephen_Sanchez_Performs__Until_I_Found_You____We_Speak_Music(256k).mp3'
+  ];
+
+  // Start the background playlist when "PLAY MUSIC" is clicked
+  const playBgPlaylist = () => {
+    const audio = bgAudioRef?.current;
+    if (!audio) return;
+
+    // Remove previous ended listener to avoid duplicates
+    audio.onended = null;
+
+    // Remove the loop attribute so songs auto-advance
+    audio.loop = false;
+
+    audio.src = bgSongs[0];
+    audio.volume = 0.07;
+    audio.play().catch(() => {});
+
+    // When song ends, play next
+    audio.onended = () => {
+      let songIndex = 0;
+      // Find current song index from the src
+      bgSongs.forEach((s, i) => {
+        if (audio.src.includes(s.replace('/songs/', '')) || audio.src.includes(s)) {
+          songIndex = i;
+        }
+      });
+      const nextIndex = (songIndex + 1) % bgSongs.length;
+      audio.src = bgSongs[nextIndex];
+      audio.volume = 0.07;
+      audio.play().catch(() => {});
+    };
+  };
 
   const handleStep = () => {
     const key = STAGE_STEPS[step].key;
     if (key === 'curtain') { onCurtain(); return; }
-    if (key === 'music' && audioRef.current) audioRef.current.play().catch(() => {});
+    if (key === 'music') { playBgPlaylist(); }
     setDone(d => [...d, key]);
     setVisible(false);
     setTimeout(() => { setStep(s => s + 1); setVisible(true); }, 500);
@@ -198,8 +232,6 @@ const StagePrep = ({ onCurtain }) => {
 
       {done.includes('lights') && <FairyLights />}
       {done.includes('balloons') && <Balloons />}
-
-      <audio ref={audioRef} loop src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" />
 
       <div
         className="relative z-10 flex flex-col items-center gap-8 rounded-2xl px-10 py-12"
@@ -249,19 +281,25 @@ const CurtainReveal = ({ onDone }) => {
 // ── Cake Cut ──────────────────────────────────────────────────────────────────
 const CakeCut = ({ onDone }) => {
   const [phase, setPhase] = useState('idle');
+  const [showMessage, setShowMessage] = useState(false);
 
-  // Fixed rendered size — wide cake, centered on screen
-  const W = Math.min(window.innerWidth * 0.62, 560);
-  const H = Math.round(W * (1429 / 1369));
+  // Cake dimensions matching reference image proportions.
+  // Reference: cake occupies ~24% of the full image frame.
+  // Width scales with viewport; height derived from cake's natural aspect ratio (677:369).
+  const W = Math.min(window.innerWidth * 0.8, 650);
+  const H = Math.round(W * (369 / 677));
   const HALF = Math.round(W / 2);
 
   const handleCut = () => {
     if (phase !== 'idle') return;
     setPhase('cutting');
-    setTimeout(() => setPhase('split'), 420);
-    setTimeout(() => setPhase('message'), 1200);
-    setTimeout(() => setPhase('disappear'), 3200); // 2 seconds after message appears
-    setTimeout(onDone, 4200);
+    setTimeout(() => setPhase('split'), 400);
+    setTimeout(() => {
+      setPhase('disappear');
+      setShowMessage(true);
+    }, 1400);
+    // Message stays visible for ~5.6 seconds
+    setTimeout(onDone, 7000);
   };
 
   return (
@@ -298,132 +336,219 @@ const CakeCut = ({ onDone }) => {
               borderRadius: 4, boxShadow: '0 0 20px 8px rgba(255,255,255,0.98)' }} />
         )}
 
-        {/* LEFT HALF */}
-        <div style={{
-          position: 'absolute', left: 0, top: 0,
-          width: HALF, height: H,
-          overflow: 'hidden',
-          transform: phase==='split'||phase==='message'
-            ? `translateX(-${Math.round(HALF * 0.75)}px) rotate(-10deg)` : 'translateX(0) rotate(0deg)',
-          transition: 'transform 1.1s cubic-bezier(0.22,1.2,0.36,1), opacity 1s ease-out',
-          transformOrigin: 'bottom left',
-          opacity: phase === 'disappear' ? 0 : 1,
-        }}>
+        {/* SINGLE INTACT CAKE — shown before and during the cut */}
+        {(phase === 'idle' || phase === 'cutting') && (
           <img src="/cake.png"
             width={W} height={H}
-            style={{ display: 'block', width: W, height: H, maxWidth: 'none' }}
+            style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }}
             alt="cake"
           />
-        </div>
+        )}
 
-        {/* RIGHT HALF */}
-        <div style={{
-          position: 'absolute', left: HALF, top: 0,
-          width: HALF, height: H,
-          overflow: 'hidden',
-          transform: phase==='split'||phase==='message'
-            ? `translateX(${Math.round(HALF * 0.75)}px) rotate(10deg)` : 'translateX(0) rotate(0deg)',
-          transition: 'transform 1.1s cubic-bezier(0.22,1.2,0.36,1), opacity 1s ease-out',
-          transformOrigin: 'bottom right',
-          opacity: phase === 'disappear' ? 0 : 1,
-        }}>
-          <img src="/cake.png"
-            width={W} height={H}
-            style={{ display: 'block', width: W, height: H, maxWidth: 'none', marginLeft: -HALF }}
-            alt="cake"
-          />
-        </div>
+        {/* LEFT HALF — only appears after cutting, slides left */}
+        {(phase === 'split' || phase === 'disappear') && (
+          <div style={{
+            position: 'absolute', left: 0, top: 0,
+            width: HALF, height: H,
+            overflow: 'hidden',
+            transform: phase === 'disappear'
+              ? `translateX(-${HALF}px) rotate(-15deg)`
+              : `translateX(-${Math.round(HALF * 0.25)}px) rotate(-5deg)`,
+            transition: 'transform 0.8s cubic-bezier(0.22,1.2,0.36,1), opacity 0.6s ease-out',
+            transformOrigin: 'bottom left',
+            opacity: phase === 'disappear' ? 0 : 1,
+          }}>
+            <img src="/cake.png"
+              width={W} height={H}
+              style={{ display: 'block', width: W, height: H, maxWidth: 'none' }}
+              alt="cake left half"
+            />
+          </div>
+        )}
 
-        {/* Happy Birthday from center gap */}
-        {phase === 'message' && (
+        {/* RIGHT HALF — only appears after cutting, slides right */}
+        {(phase === 'split' || phase === 'disappear') && (
+          <div style={{
+            position: 'absolute', left: HALF, top: 0,
+            width: HALF, height: H,
+            overflow: 'hidden',
+            transform: phase === 'disappear'
+              ? `translateX(${HALF}px) rotate(15deg)`
+              : `translateX(${Math.round(HALF * 0.25)}px) rotate(5deg)`,
+            transition: 'transform 0.8s cubic-bezier(0.22,1.2,0.36,1), opacity 0.6s ease-out',
+            transformOrigin: 'bottom right',
+            opacity: phase === 'disappear' ? 0 : 1,
+          }}>
+            <img src="/cake.png"
+              width={W} height={H}
+              style={{ display: 'block', width: W, height: H, maxWidth: 'none', marginLeft: -HALF }}
+              alt="cake right half"
+            />
+          </div>
+        )}
+
+        {/* Happy Birthday celebration — big party */}
+        {showMessage && (
           <div className="absolute z-30 pointer-events-none"
-            style={{ left: '50%', top: '38%', transform: 'translateX(-50%)' }}>
-            {/* Massive confetti explosion */}
-            {Array.from({length:64}).map((_,i)=>(<div key={i} className="absolute cake-confetti" style={{
-              '--angle': `${(i/64)*360}deg`,
-              '--dist': `${80+(i%8)*25}px`,
-              background: ['#f472b6','#fbbf24','#a78bfa','#34d399','#fb7185','#60a5fa','#fde68a','#f9a8d4','#ff6b9d','#ffd700','#7c3aed','#22d3ee'][i%12],
-              width: i%4===0?16:10, height: i%4===0?16:10,
+            style={{ left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
+
+            {/* Wave 1 — Massive confetti explosion */}
+            {Array.from({length:80}).map((_,i)=>(<div key={`conf1-${i}`} className="absolute cake-confetti" style={{
+              '--angle': `${(i/80)*360}deg`,
+              '--dist': `${60+(i%10)*30}px`,
+              background: ['#f472b6','#fbbf24','#a78bfa','#34d399','#fb7185','#60a5fa','#fde68a','#f9a8d4','#ff6b9d','#ffd700','#7c3aed','#22d3ee','#ec4899','#f97316'][i%14],
+              width: i%4===0?18:10, height: i%4===0?18:10,
               borderRadius: i%2===0?'50%':'2px',
-              animationDelay: `${i*0.03}s`,
-              animationDuration: '1.5s',
+              animationDelay: `${i*0.02}s`,
+              animationDuration: '2s',
             }} />))}
-            
-            {/* Sparkle effects */}
-            {Array.from({length:20}).map((_,i)=>(<div key={`sparkle-${i}`} className="absolute animate-float" style={{
-              left: `${-60+Math.random()*120}%`,
-              top: `${-60+Math.random()*120}%`,
-              fontSize: `${16+Math.random()*16}px`,
-              animationDelay: `${i*0.1}s`,
-              animationDuration: `${1.5+Math.random()*1}s`,
+
+            {/* Wave 2 — delayed confetti */}
+            {Array.from({length:50}).map((_,i)=>(<div key={`conf2-${i}`} className="absolute cake-confetti" style={{
+              '--angle': `${(i/50)*360+30}deg`,
+              '--dist': `${40+(i%6)*35}px`,
+              background: ['#facc15','#f472b6','#60a5fa','#34d399','#fb923c','#c084fc','#f472b6','#22d3ee'][i%8],
+              width: i%3===0?14:8, height: i%3===0?14:8,
+              borderRadius: i%2===0?'50%':'1px',
+              animationDelay: `${0.4+i*0.025}s`,
+              animationDuration: '2.2s',
+            }} />))}
+
+            {/* Wave 3 — late confetti burst */}
+            {Array.from({length:30}).map((_,i)=>(<div key={`conf3-${i}`} className="absolute cake-confetti" style={{
+              '--angle': `${(i/30)*360+90}deg`,
+              '--dist': `${50+(i%5)*40}px`,
+              background: ['#ffd700','#ff6b9d','#a78bfa','#fbbf24','#34d399'][i%5],
+              width: 12, height: 12,
+              borderRadius: '50%',
+              animationDelay: `${0.8+i*0.04}s`,
+              animationDuration: '2.5s',
+            }} />))}
+
+            {/* Shooting stars / streamers */}
+            {Array.from({length:12}).map((_,i)=>(<div key={`star-${i}`} className="absolute" style={{
+              left: '50%', top: '50%',
+              width: '4px', height: '40px',
+              background: `linear-gradient(to top, transparent, ${['#ffd700','#f472b6','#60a5fa','#34d399','#fb923c','#c084fc','#f472b6','#facc15','#22d3ee','#ff6b9d','#a78bfa','#fde68a'][i]})`,
+              borderRadius: '2px',
+              transform: `translate(-50%, -50%) rotate(${i*30}deg) translateY(-${120+Math.random()*60}px)`,
+              opacity: 0,
+              animation: `confettiBurst 1.8s ease-out ${0.6+i*0.05}s forwards`,
+              '--angle': `${i*30}deg`,
+              '--dist': `${150+Math.random()*80}px`,
+            }} />))}
+
+            {/* Golden sparkle particles */}
+            {Array.from({length:30}).map((_,i)=>(<div key={`spark-${i}`} className="absolute animate-float" style={{
+              left: `${-80+Math.random()*160}%`,
+              top: `${-80+Math.random()*160}%`,
+              fontSize: `${12+Math.random()*24}px`,
+              animationDelay: `${i*0.08}s`,
+              animationDuration: `${1.5+Math.random()*1.5}s`,
             }}>✨</div>))}
+            
+            {/* Twinkle stars */}
+            {Array.from({length:15}).map((_,i)=>(<div key={`twinkle-${i}`} className="absolute" style={{
+              left: `${-70+Math.random()*140}%`,
+              top: `${-70+Math.random()*140}%`,
+              fontSize: `${18+Math.random()*20}px`,
+              opacity: 0,
+              animation: `twinkleStar 1s ease-out ${0.5+Math.random()*0.8}s infinite alternate`,
+            }}>⭐</div>))}
             
             {/* Multiple glow rings */}
             <div style={{
               position:'absolute', left:'50%', top:'50%',
               transform:'translate(-50%,-50%)',
-              width:350, height:350,
+              width:450, height:450,
               borderRadius:'50%',
-              background:'radial-gradient(circle, rgba(244,114,182,0.5) 0%, rgba(167,139,250,0.3) 40%, transparent 70%)',
-              animation:'hbGlow 1.5s ease-out forwards',
+              background:'radial-gradient(circle, rgba(244,114,182,0.6) 0%, rgba(167,139,250,0.35) 30%, rgba(251,191,36,0.15) 50%, transparent 70%)',
+              animation:'hbGlow 2s ease-out forwards',
             }} />
             <div style={{
               position:'absolute', left:'50%', top:'50%',
               transform:'translate(-50%,-50%)',
-              width:280, height:280,
+              width:320, height:320,
               borderRadius:'50%',
-              background:'radial-gradient(circle, rgba(251,191,36,0.4) 0%, transparent 60%)',
-              animation:'hbGlow 1.8s ease-out forwards',
-              animationDelay: '0.2s',
+              background:'radial-gradient(circle, rgba(251,191,36,0.5) 0%, rgba(244,114,182,0.3) 40%, transparent 65%)',
+              animation:'hbGlow 2.2s ease-out forwards',
+              animationDelay: '0.3s',
+            }} />
+            <div style={{
+              position:'absolute', left:'50%', top:'50%',
+              transform:'translate(-50%,-50%)',
+              width:220, height:220,
+              borderRadius:'50%',
+              background:'radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(251,191,36,0.2) 50%, transparent 70%)',
+              animation:'hbGlow 1.5s ease-out forwards',
+              animationDelay: '0.6s',
             }} />
             
-            {/* main text with enhanced animation */}
+            {/* main celebration text */}
             <div style={{
               position:'relative',
-              display:'flex', flexDirection:'column', alignItems:'center', gap:12,
-              animation:'hbPop 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards',
+              display:'flex', flexDirection:'column', alignItems:'center', gap:14,
+              animation:'hbPop 0.9s cubic-bezier(0.34,1.56,0.64,1) forwards',
             }}>
-              {/* Top emojis */}
+              {/* Top emojis — bigger festive row */}
               <div style={{ 
-                display:'flex', gap:'20px', 
-                animation: 'float 2s ease-in-out infinite',
-                fontSize: '48px',
-                marginBottom: '10px'
+                display:'flex', gap:'24px', 
+                fontSize: '52px',
+                animation: 'float 2.5s ease-in-out infinite',
+                marginBottom: '12px'
               }}>
-                <span style={{ animationDelay: '0s' }}>🎂</span>
-                <span style={{ animationDelay: '0.2s' }}>🎉</span>
-                <span style={{ animationDelay: '0.4s' }}>🎂</span>
+                <span style={{ animationDelay: '0s' }}>🎉</span>
+                <span style={{ animationDelay: '0.15s' }}>🎂</span>
+                <span style={{ animationDelay: '0.3s' }}>🎊</span>
+                <span style={{ animationDelay: '0.45s' }}>🎉</span>
+                <span style={{ animationDelay: '0.6s' }}>🎂</span>
               </div>
               
-              {/* Main Happy Birthday text - CURVED ARC */}
+              {/* Main Happy Birthday text - BIG CELEBRATION STYLE */}
               <div style={{
                 position: 'relative',
-                width: '400px',
-                height: '200px',
+                width: '520px',
+                height: '190px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-                <svg viewBox="0 0 400 200" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+                <svg viewBox="0 0 600 220" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
                   <defs>
                     <linearGradient id="textGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                       <stop offset="0%" stopColor="#f472b6" />
-                      <stop offset="50%" stopColor="#fbbf24" />
-                      <stop offset="100%" stopColor="#a78bfa" />
+                      <stop offset="25%" stopColor="#fbbf24" />
+                      <stop offset="50%" stopColor="#f472b6" />
+                      <stop offset="75%" stopColor="#a78bfa" />
+                      <stop offset="100%" stopColor="#fbbf24" />
                     </linearGradient>
                     <filter id="glow">
-                      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
                       <feMerge>
                         <feMergeNode in="coloredBlur"/>
                         <feMergeNode in="SourceGraphic"/>
                       </feMerge>
                     </filter>
+                    <filter id="strongGlow">
+                      <feGaussianBlur stdDeviation="6" result="blur"/>
+                      <feColorMatrix in="blur" type="matrix"
+                        values="1 0 0 0 0.2  0 0.5 0 0 0  0 0 0.5 0 0  0 0 0 1 0"/>
+                      <feMerge>
+                        <feMergeNode/>
+                        <feMergeNode in="SourceGraphic"/>
+                      </feMerge>
+                    </filter>
                   </defs>
                   
-                  {/* Curved path for text */}
+                  {/* Glow behind text */}
+                  <ellipse cx="300" cy="120" rx="240" ry="70" fill="rgba(244,114,182,0.15)" filter="url(#strongGlow)">
+                    <animate attributeName="rx" values="220;260;220" dur="2s" repeatCount="indefinite"/>
+                  </ellipse>
+                  
+                  {/* Curved path for text - wider arc to fit full text */}
                   <path 
                     id="curvePath" 
-                    d="M 50 150 Q 200 20 350 150" 
+                    d="M 30 160 Q 300 15 570 160" 
                     fill="none" 
                     stroke="none"
                   />
@@ -433,7 +558,7 @@ const CakeCut = ({ onDone }) => {
                     fill="url(#textGradient)" 
                     fontFamily="Georgia, serif" 
                     fontWeight="900" 
-                    fontSize="42"
+                    fontSize="50"
                     letterSpacing="0.08em"
                     filter="url(#glow)"
                   >
@@ -453,34 +578,42 @@ const CakeCut = ({ onDone }) => {
               
               {/* Bottom emojis */}
               <div style={{ 
-                display:'flex', gap:'20px',
-                animation: 'float 2s ease-in-out infinite reverse',
-                fontSize: '48px',
-                marginTop: '10px'
+                display:'flex', gap:'24px',
+                fontSize: '52px',
+                animation: 'float 2.5s ease-in-out infinite reverse',
+                marginTop: '12px'
               }}>
-                <span style={{ animationDelay: '0.4s' }}>🎂</span>
-                <span style={{ animationDelay: '0.2s' }}>🎊</span>
-                <span style={{ animationDelay: '0s' }}>🎂</span>
+                <span style={{ animationDelay: '0.6s' }}>🎂</span>
+                <span style={{ animationDelay: '0.45s' }}>🎊</span>
+                <span style={{ animationDelay: '0.3s' }}>🎉</span>
+                <span style={{ animationDelay: '0.15s' }}>🎂</span>
+                <span style={{ animationDelay: '0s' }}>🎉</span>
               </div>
               
-              {/* Additional celebration emojis */}
+              {/* Side floating balloons */}
               <div style={{
-                position: 'absolute',
-                top: '-40px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                fontSize: '36px',
-                animation: 'float 1.5s ease-in-out infinite',
+                position: 'absolute', top: '-50%', left: '-30%',
+                fontSize: '42px',
+                animation: 'float 2s ease-in-out infinite',
               }}>🎈</div>
               <div style={{
-                position: 'absolute',
-                bottom: '-40px',
-                left: '50%',
-                transform: 'translateX(-50%)',
+                position: 'absolute', top: '-40%', right: '-30%',
                 fontSize: '36px',
-                animation: 'float 1.5s ease-in-out infinite',
-                animationDelay: '0.3s',
+                animation: 'float 2.2s ease-in-out infinite',
+                animationDelay: '0.4s',
               }}>🎈</div>
+              <div style={{
+                position: 'absolute', bottom: '-30%', left: '-20%',
+                fontSize: '32px',
+                animation: 'float 1.8s ease-in-out infinite',
+                animationDelay: '0.8s',
+              }}>🎊</div>
+              <div style={{
+                position: 'absolute', bottom: '-25%', right: '-25%',
+                fontSize: '38px',
+                animation: 'float 2.4s ease-in-out infinite',
+                animationDelay: '0.2s',
+              }}>🎉</div>
             </div>
           </div>
         )}
@@ -662,12 +795,12 @@ const GiftHub = ({ onSelect, bgAudioRef: externalBgAudioRef }) => {
   // Use external ref if provided, otherwise use internal
   const bgAudio = externalBgAudioRef || internalBgAudioRef;
 
-  // Background music for gift page
+  // Background playlist — only set up the "ended" listener to advance songs.
+  // Music is already started from StagePrep's "PLAY MUSIC" button.
   useEffect(() => {
     const audioEl = bgAudio.current;
     if (!audioEl) return;
 
-    // Background songs: The Night We Met and I Found You
     const bgSongs = [
       '/songs/Lord_Huron_-_The_Night_We_Met__Official_Audio_(256k).mp3',
       '/songs/Stephen_Sanchez_Performs__Until_I_Found_You____We_Speak_Music(256k).mp3'
@@ -677,31 +810,22 @@ const GiftHub = ({ onSelect, bgAudioRef: externalBgAudioRef }) => {
       setCurrentSongIndex(prev => {
         const nextIndex = (prev + 1) % bgSongs.length;
         audioEl.src = bgSongs[nextIndex];
-        audioEl.volume = 0.07; // Low volume (7%)
+        audioEl.volume = 0.07;
         audioEl.play().catch(() => {});
         return nextIndex;
       });
     };
 
-    // Start playing first song
-    audioEl.src = bgSongs[0];
-    audioEl.volume = 0.07; // Low volume
-    audioEl.play().catch(() => {});
-    
-    // When song ends, play next
+    // Only attach ended listener — don't start playback (already started by StagePrep)
     audioEl.addEventListener('ended', playNextSong);
 
     return () => {
-      audioEl.pause();
       audioEl.removeEventListener('ended', playNextSong);
     };
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col" {...BG}>
-      {/* Background music player (hidden) */}
-      <audio ref={bgAudio} loop={false} preload="auto" />
-      
       <PhotoString />
       <div className="flex flex-col items-center justify-center flex-1 gap-6 p-6 pt-2">
         <h1 className="text-white text-3xl font-bold tracking-widest">{content.pages.giftHub.header}</h1>
@@ -771,19 +895,29 @@ const OurSongs = ({ onBack, bgAudioRef: externalBgAudioRef }) => {
 
   const song = songs[active];
 
-  // Audio file paths - matching actual filenames in public/songs folder
+  // Audio file paths - URL encoded to handle special characters in filenames
   const audioFiles = [
-    '/songs/Since_Tum(128k).m4a',     // Since Tum - JANI
-    '/songs/HUMSAFAR_-_TAIMOUR_BAIG___Prod._Raffey_Anwar__Official_Audio_(256k).mp3',  // Humsafar
-    '/songs/Ishq_Wala_Love___4K___Alia_Bhatt,_Sidharth_Malhotra,_Varun_Dhawan___Neeti_Mohan___Salim_Merchant(256k).mp3',  // Ishq Wala Love
-    '/songs/Kaise_Bataaoon_-_Full_Song_With_Lyrics___Mithoon___Amar_Mohile___3G(256k).mp3',  // Kaise Bataaoon
-    '/songs/The_Fate_of_Ophelia__The_Chainsmokers_Remix_(256k).mp3'  // The Fate of Ophelia
+    '/songs/Since_Tum(128k).m4a',
+    '/songs/HUMSAFAR_-_TAIMOUR_BAIG___Prod._Raffey_Anwar__Official_Audio_(256k).mp3',
+    '/songs/Ishq_Wala_Love___4K___Alia_Bhatt,_Sidharth_Malhotra,_Varun_Dhawan___Neeti_Mohan___Salim_Merchant(256k).mp3',
+    '/songs/Kaise_Bataaoon_-_Full_Song_With_Lyrics___Mithoon___Amar_Mohile___3G(256k).mp3',
+    '/songs/The_Fate_of_Ophelia__The_Chainsmokers_Remix_(256k).mp3'
   ];
+
+  // Encode special characters in file paths
+  const encodePath = (path) => {
+    const parts = path.split('/');
+    const encoded = parts.map(p => {
+      if (p === '') return '';
+      return encodeURIComponent(p);
+    });
+    return encoded.join('/').replace(/%2F/g, '/');
+  };
 
   useEffect(() => {
     // Initialize audio with the current song
     if (audioRef.current) {
-      const filePath = audioFiles[active];
+      const filePath = encodePath(audioFiles[active]);
       console.log('Loading audio file:', filePath);
       audioRef.current.src = filePath;
       audioRef.current.load();
@@ -802,7 +936,12 @@ const OurSongs = ({ onBack, bgAudioRef: externalBgAudioRef }) => {
           externalBgAudioRef.current.play().catch(() => {});
         }
       } else {
-        console.log('Attempting to play:', audioFiles[active]);
+        // Ensure audio source is set
+        if (!audioRef.current.src || audioRef.current.src === '') {
+          audioRef.current.src = encodePath(audioFiles[active]);
+          audioRef.current.load();
+        }
+        console.log('Attempting to play:', audioRef.current.src);
         // Pause background music
         if (externalBgAudioRef?.current) {
           externalBgAudioRef.current.pause();
@@ -813,7 +952,8 @@ const OurSongs = ({ onBack, bgAudioRef: externalBgAudioRef }) => {
     } catch (error) {
       console.error('Playback failed:', error);
       console.log('Audio source:', audioRef.current.src);
-      // Silently fail - audio files not yet added
+      // Show error message to user
+      alert('Could not play audio. The file may be missing or in an unsupported format. Check that song files exist in the public/songs folder.');
     }
   };
 
@@ -1267,7 +1407,7 @@ const Home = () => {
   const pages = {
     passcode:   <PasscodeLock onUnlock={() => setPage('intro')} />,
     intro:      <IntroModal onDone={() => setPage('stage')} />,
-    stage:      <StagePrep onCurtain={() => setShowCurtain(true)} />,
+    stage:      <StagePrep onCurtain={() => setShowCurtain(true)} bgAudioRef={bgAudioRef} />,
     cakeCut:    <CakeCut onDone={() => setPage('gifts')} />,
     gifts:      <GiftHub onSelect={setPage} bgAudioRef={bgAudioRef} />,
     takeSelfie: <TakeASelfie key={page} onBack={() => setPage('gifts')} />,
@@ -1280,6 +1420,9 @@ const Home = () => {
 
   return (
     <div className="transition-all duration-500">
+      {/* Persistent audio element — lives across all pages */}
+      <audio ref={bgAudioRef} preload="auto" />
+      
       {pages[page]}
       {showCurtain && <CurtainReveal onDone={() => { setShowCurtain(false); setPage('cakeCut'); }} />}
     </div>
