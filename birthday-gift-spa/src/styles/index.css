@@ -334,3 +334,482 @@
 .animate-photoAppear {
   animation: photoAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
+
+/* ===== RESPONSIVE UTILITIES ===== */
+
+/* Responsive passcode lock - stack on mobile */
+@media (max-width: 768px) {
+  .passcode-layout {
+    flex-direction: column !important;
+  }
+  .passcode-layout > div {
+    flex: none !important;
+    width: 100% !important;
+  }
+  .passcode-polaroid {
+    padding: 1.5rem !important;
+    min-height: auto !important;
+  }
+  .passcode-polaroid img {
+    height: 35vh !important;
+    max-height: 300px !important;
+  }
+  .passcode-pad {
+    padding: 1.5rem !important;
+    gap: 1.5rem !important;
+  }
+  .passcode-pad h1 {
+    font-size: 1.5rem !important;
+  }
+  .passcode-pad .grid {
+    gap: 0.75rem !important;
+  }
+  .passcode-pad button {
+    width: 4rem !important;
+    height: 4rem !important;
+    font-size: 1.25rem !important;
+  }
+  .passcode-dots {
+    gap: 0.75rem !important;
+  }
+  .passcode-dots > div {
+    width: 0.75rem !important;
+    height: 0.75rem !important;
+  }
+}
+
+/* Responsive cake celebration */
+@media (max-width: 640px) {
+  .cake-celebration-svg {
+    width: 90vw !important;
+    max-width: 360px !important;
+  }
+  .cake-celebration-svg svg {
+    width: 100% !important;
+    height: auto !important;
+  }
+  .cake-celebration-text {
+    font-size: 2rem !important;
+  }
+  .cake-emoji-row {
+    font-size: 2rem !important;
+    gap: 0.75rem !important;
+  }
+  .cake-emoji-row span {
+    font-size: 2rem !important;
+  }
+  .cake-glow-ring {
+    width: 250px !important;
+    height: 250px !important;
+  }
+  .cake-glow-ring-2 {
+    width: 180px !important;
+    height: 180px !important;
+  }
+  .cake-glow-ring-3 {
+    width: 130px !important;
+    height: 130px !important;
+  }
+}
+
+/* Responsive photo string */
+@media (max-width: 768px) {
+  .photo-string-container {
+    height: 220px !important;
+  }
+  .photo-string-card {
+    width: 100px !important;
+  }
+  .photo-string-card img {
+    height: 80px !important;
+  }
+  .photo-string-card > div {
+    padding: 5px !important;
+    padding-bottom: 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .photo-string-container {
+    height: 180px !important;
+  }
+  .photo-string-card {
+    width: 80px !important;
+  }
+  .photo-string-card img {
+    height: 65px !important;
+  }
+  .photo-string-card > div {
+    padding: 4px !important;
+    padding-bottom: 6px !important;
+  }
+}
+
+/* Responsive secret message canvas */
+@media (max-width: 640px) {
+  .secret-canvas-wrapper {
+    width: calc(100vw - 3rem) !important;
+    max-width: 320px !important;
+  }
+  .secret-canvas-wrapper canvas {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 3/2 !important;
+  }
+}
+
+/* Responsive selfie photos */
+@media (max-width: 640px) {
+  .selfie-photo-card {
+    width: 140px !important;
+  }
+  .selfie-photo-card img {
+    height: 100px !important;
+  }
+  .selfie-photo-card > div {
+    padding: 0.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .selfie-photo-card {
+    width: 120px !important;
+  }
+  .selfie-photo-card img {
+    height: 85px !important;
+  }
+}
+
+/* Responsive gift cards */
+@media (max-width: 480px) {
+  .gift-card {
+    width: 8rem !important;
+    padding: 1rem !important;
+  }
+  .gift-card .text-6xl {
+    font-size: 2.5rem !important;
+  }
+}
+
+/* Responsive keypad on very small screens */
+@media (max-width: 400px) {
+  .passcode-pad button {
+    width: 3.5rem !important;
+    height: 3.5rem !important;
+    font-size: 1.1rem !important;
+  }
+  .passcode-pad .grid {
+    gap: 0.5rem !important;
+  }
+}
+
+/* Responsive photo memory grid */
+@media (max-width: 480px) {
+  .photo-memory-grid {
+    max-width: 100% !important;
+  }
+  .photo-memory-grid > div {
+    min-height: 0 !important;
+  }
+  .photo-memory-grid .h-64 {
+    height: 10rem !important;
+  }
+  .photo-memory-grid .h-32 {
+    height: 6rem !important;
+  }
+}
+
+/* Responsive compliment garden */
+@media (max-width: 480px) {
+  .garden-area {
+    height: 16rem !important;
+  }
+}
+
+/* Responsive our songs */
+@media (max-width: 480px) {
+  .songs-player {
+    max-width: 100% !important;
+  }
+  .songs-list {
+    max-width: 100% !important;
+  }
+}
+
+/* Responsive love letter */
+@media (max-width: 480px) {
+  .letter-paper {
+    padding: 1rem !important;
+  }
+  .letter-paper pre {
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Responsive stage prep */
+@media (max-width: 480px) {
+  .stage-prep-card {
+    min-width: 0 !important;
+    max-width: calc(100vw - 2rem) !important;
+    padding: 1.5rem !important;
+  }
+  .stage-prep-card p {
+    font-size: 1rem !important;
+  }
+}
+
+/* Responsive intro modal */
+@media (max-width: 480px) {
+  .intro-modal-card {
+    min-width: 0 !important;
+    max-width: calc(100vw - 2rem) !important;
+    padding: 1.5rem !important;
+  }
+  .intro-modal-card p {
+    font-size: 1.25rem !important;
+  }
+}
+
+/* Responsive camera */
+@media (max-width: 480px) {
+  .camera-body {
+    width: 140px !important;
+    height: 140px !important;
+  }
+  .camera-lens-outer {
+    width: 90px !important;
+    height: 90px !important;
+  }
+  .camera-lens-inner {
+    width: 76px !important;
+    height: 76px !important;
+  }
+  .camera-lens-glass {
+    width: 64px !important;
+    height: 64px !important;
+  }
+}
+
+/* ===== LUXURY BIRTHDAY CELEBRATION ANIMATIONS ===== */
+
+/* Celebration container */
+.celebration-container {
+  position: relative;
+  width: 600px;
+  height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .celebration-container {
+    width: 90vw !important;
+    height: 90vw !important;
+    max-width: 500px;
+    max-height: 500px;
+  }
+}
+
+/* Background bokeh blooms */
+.celebration-bokeh {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(244,114,182,0.25) 0%, transparent 50%),
+              radial-gradient(circle at 70% 70%, rgba(206,147,216,0.2) 0%, transparent 50%);
+  animation: bokehPulse 3s ease-in-out infinite;
+}
+.celebration-bokeh-2 {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 60% 20%, rgba(255,215,0,0.15) 0%, transparent 40%),
+              radial-gradient(circle at 20% 80%, rgba(244,114,182,0.15) 0%, transparent 40%);
+  animation: bokehPulse 3.5s ease-in-out infinite 0.5s;
+}
+.celebration-bokeh-3 {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
+  animation: bokehPulse 4s ease-in-out infinite 1s;
+}
+.celebration-bokeh-4 {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 60%, rgba(206,147,216,0.2) 0%, transparent 45%),
+              radial-gradient(circle at 80% 30%, rgba(255,215,0,0.1) 0%, transparent 40%);
+  animation: bokehPulse 2.8s ease-in-out infinite 0.8s;
+}
+
+@keyframes bokehPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* Glowing oval burst behind text */
+.celebration-oval-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(244,114,182,0.3) 0%, rgba(206,147,216,0.15) 30%, rgba(255,215,0,0.08) 50%, transparent 70%);
+  animation: ovalGlow 2.5s ease-in-out infinite;
+  filter: blur(8px);
+}
+
+@keyframes ovalGlow {
+  0%, 100% { transform: translate(-50%, -50%) scaleX(1) scaleY(1); opacity: 0.7; }
+  50% { transform: translate(-50%, -50%) scaleX(1.1) scaleY(1.05); opacity: 1; }
+}
+
+/* Jewel cascade animation */
+.celebration-jewel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(var(--angle)) translateX(var(--dist)) rotate(calc(-1 * var(--angle)));
+  animation: jewelFloat 2s ease-in-out infinite;
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px rgba(255,215,0,0.4));
+}
+
+@keyframes jewelFloat {
+  0%, 100% { 
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateX(var(--dist)) rotate(calc(-1 * var(--angle))) translateY(0);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateX(var(--dist)) rotate(calc(-1 * var(--angle))) translateY(-8px);
+    opacity: 1;
+  }
+}
+
+/* Main content area */
+.celebration-main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+}
+
+/* Crystal star above text */
+.celebration-crystal-star {
+  position: relative;
+  margin-bottom: 4px;
+  animation: starPulse 2s ease-in-out infinite;
+}
+
+@keyframes starPulse {
+  0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 15px rgba(255,215,0,0.6)); }
+  50% { transform: scale(1.08) rotate(5deg); filter: drop-shadow(0 0 30px rgba(255,215,0,0.9)); }
+}
+
+/* Small stars and bows around big star */
+.celebration-star-bow {
+  position: absolute;
+  animation: float 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Text wrapper */
+.celebration-text-wrapper {
+  position: relative;
+  width: 520px;
+  max-width: 85vw;
+  height: 200px;
+}
+
+@media (max-width: 640px) {
+  .celebration-text-wrapper {
+    width: 90vw !important;
+    height: 140px !important;
+  }
+}
+
+/* Crown styling */
+.celebration-crown {
+  position: relative;
+  margin-top: 4px;
+  animation: crownFloat 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px rgba(255,215,0,0.5));
+}
+
+@keyframes crownFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Party poppers */
+.celebration-popper-left {
+  position: absolute;
+  left: -20px;
+  bottom: 10px;
+  animation: popperBurst 2s ease-in-out infinite;
+}
+
+.celebration-popper-right {
+  position: absolute;
+  right: -20px;
+  bottom: 10px;
+  animation: popperBurst 2s ease-in-out infinite 0.3s;
+}
+
+@keyframes popperBurst {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(-5deg); }
+}
+
+/* Floating jewels around crown */
+.celebration-crown-jewel {
+  position: absolute;
+  animation: float 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Sparkle particles */
+.celebration-sparkle {
+  position: absolute;
+  animation: sparkleTwinkle 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes sparkleTwinkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Responsive celebration adjustments */
+@media (max-width: 640px) {
+  .celebration-oval-glow {
+    width: 300px !important;
+    height: 200px !important;
+  }
+  .celebration-crystal-star svg {
+    width: 50px !important;
+    height: 50px !important;
+  }
+  .celebration-crown svg {
+    width: 120px !important;
+    height: 72px !important;
+  }
+  .celebration-popper-left svg,
+  .celebration-popper-right svg {
+    width: 30px !important;
+    height: 48px !important;
+  }
+  .celebration-popper-left {
+    left: -10px !important;
+  }
+  .celebration-popper-right {
+    right: -10px !important;
+  }
+}
