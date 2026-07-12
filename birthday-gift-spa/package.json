@@ -4,10 +4,9 @@
   "description": "A highly interactive single-page web application for presenting digital birthday gifts.",
   "main": "src/main.jsx",
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port 3000",
+    "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0 --port 3000",
-    "start": "vite --host 0.0.0.0 --port 3000"
+    "preview": "vite preview"
   },
   "dependencies": {
     "react": "^18.0.0",
