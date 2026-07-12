@@ -389,313 +389,99 @@ const CakeCut = ({ onDone }) => {
 
         {/* ── LUXURIOUS BIRTHDAY CELEBRATION ── */}
         {showMessage && (
-          <div className="absolute z-30 pointer-events-none celebration-container"
+          <div className="absolute z-30 pointer-events-none glassmorphic-container"
             style={{ left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }}>
 
-            {/* ── Background bokeh blooms ── */}
+            {/* ── Background bokeh blooms (kept from original) ── */}
             <div className="celebration-bokeh" />
             <div className="celebration-bokeh-2" />
             <div className="celebration-bokeh-3" />
             <div className="celebration-bokeh-4" />
 
-            {/* ── Glowing oval burst behind text ── */}
-            <div className="celebration-oval-glow" />
-
-            {/* ── Dense circular cascade of jewels, pearls, stars, bows ── */}
-            {Array.from({length:60}).map((_,i)=>{
-              const angle = (i/60)*360;
-              const dist = 160 + (i%5)*25;
-              const emojis = ['💎','🩷','⭐','🎀','💎','🩷','⭐','🎀','💎','🩷'];
-              const sizes = [22,18,20,24,16,20,18,22,20,16];
-              return (
-                <div key={`jewel-${i}`} className="celebration-jewel"
-                  style={{
-                    '--angle': `${angle}deg`,
-                    '--dist': `${dist}px`,
-                    fontSize: `${sizes[i%10]}px`,
-                    animationDelay: `${0.3 + i*0.04}s`,
-                    animationDuration: `${1.8 + (i%3)*0.4}s`,
-                  }}>{emojis[i%10]}</div>
-              );
-            })}
-
-            {/* ── Inner ring of smaller jewels ── */}
+            {/* ── Outer particles: jewels, stars, hearts (kept from original but further out) ── */}
             {Array.from({length:40}).map((_,i)=>{
-              const angle = (i/40)*360 + 15;
-              const dist = 100 + (i%4)*15;
-              const emojis = ['💎','⭐','🩷','🎀','💎','⭐','🩷','🎀'];
+              const angle = (i/40)*360;
+              const dist = 220 + (i%4)*30;
+              const emojis = ['💎','🩷','⭐','🎀','💎','⭐','🩷','🎀'];
               return (
-                <div key={`inner-jewel-${i}`} className="celebration-jewel"
+                <div key={`outer-${i}`} className="glassmorphic-particle-outside"
                   style={{
                     '--angle': `${angle}deg`,
                     '--dist': `${dist}px`,
-                    fontSize: `${14 + (i%3)*4}px`,
-                    animationDelay: `${0.5 + i*0.03}s`,
-                    animationDuration: `${2 + (i%3)*0.3}s`,
+                    fontSize: `${18 + (i%4)*6}px`,
+                    animationDelay: `${0.5 + i*0.04}s`,
+                    animationDuration: `${2 + (i%3)*0.4}s`,
                   }}>{emojis[i%8]}</div>
               );
             })}
 
-            {/* ── Outer scattered pearls and rose quartz ── */}
+            {/* ── Mid-ring floating elements ── */}
             {Array.from({length:30}).map((_,i)=>{
-              const angle = (i/30)*360 + 45;
-              const dist = 220 + (i%5)*20;
+              const angle = (i/30)*360 + 20;
+              const dist = 180 + (i%3)*20;
               return (
-                <div key={`pearl-${i}`} className="celebration-jewel"
+                <div key={`mid-${i}`} className="glassmorphic-particle-outside"
                   style={{
                     '--angle': `${angle}deg`,
                     '--dist': `${dist}px`,
-                    fontSize: `${12 + (i%4)*6}px`,
-                    animationDelay: `${0.6 + i*0.05}s`,
-                    animationDuration: `${2.2 + (i%3)*0.5}s`,
+                    fontSize: `${14 + (i%3)*5}px`,
+                    animationDelay: `${0.7 + i*0.05}s`,
+                    animationDuration: `${2.2 + (i%3)*0.3}s`,
                   }}>{i%3===0?'🩷':i%3===1?'💎':'⭐'}</div>
               );
             })}
 
-            {/* ── Main content ── */}
-            <div className="celebration-main" style={{ animation: 'hbPop 0.9s cubic-bezier(0.34,1.56,0.64,1) forwards' }}>
+            {/* ── Frosted Glass Panel (glassmorphism) ── */}
+            <div className="glassmorphic-panel animate-glassFadeIn">
+              <div className="glassmorphic-glow" />
 
-              {/* ── Large five-point crystal star above text ── */}
-              <div className="celebration-crystal-star">
-                <svg viewBox="0 0 100 100" width="80" height="80" style={{ filter: 'drop-shadow(0 0 20px rgba(255,215,0,0.8))' }}>
+              {/* ── Subtle top star (reduced brightness) ── */}
+              <div className="glassmorphic-top-star">
+                <svg viewBox="0 0 100 100" width="40" height="40">
                   <defs>
-                    <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <linearGradient id="starGradGlass" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stopColor="#fff5e6" />
                       <stop offset="30%" stopColor="#ffd700" />
-                      <stop offset="60%" stopColor="#ffb300" />
                       <stop offset="100%" stopColor="#fff5e6" />
                     </linearGradient>
-                    <filter id="starGlow">
-                      <feGaussianBlur stdDeviation="3" result="blur"/>
-                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                    </filter>
-                  </defs>
-                  <polygon points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35" 
-                    fill="url(#starGrad)" filter="url(#starGlow)" stroke="#ffd700" strokeWidth="1.5">
-                    <animate attributeName="opacity" values="0.8;1;0.8" dur="1.5s" repeatCount="indefinite"/>
-                  </polygon>
-                  {/* Star sparkle */}
-                  <circle cx="50" cy="50" r="3" fill="white" opacity="0.9">
-                    <animate attributeName="r" values="2;5;2" dur="1s" repeatCount="indefinite"/>
-                  </circle>
-                </svg>
-              </div>
-
-              {/* ── Small stars and bows around the big star ── */}
-              <div className="celebration-star-bow" style={{ top: '-10px', left: '-30px', animationDelay: '0.2s' }}>⭐</div>
-              <div className="celebration-star-bow" style={{ top: '-5px', right: '-25px', animationDelay: '0.4s' }}>🎀</div>
-              <div className="celebration-star-bow" style={{ top: '20px', left: '-45px', animationDelay: '0.6s', fontSize: '16px' }}>💎</div>
-              <div className="celebration-star-bow" style={{ top: '15px', right: '-40px', animationDelay: '0.3s', fontSize: '14px' }}>⭐</div>
-
-              {/* ── "HAPPY BIRTHDAY DEVANSHII" text ── */}
-              <div className="celebration-text-wrapper">
-                <svg viewBox="0 0 800 260" style={{ width: '100%', height: '100%' }}>
-                  <defs>
-                    {/* Crystal-beveled gradient with pearlescent finish */}
-                    <linearGradient id="crystalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#fce4ec" />
-                      <stop offset="15%" stopColor="#f8bbd0" />
-                      <stop offset="30%" stopColor="#f472b6" />
-                      <stop offset="50%" stopColor="#e040fb" />
-                      <stop offset="70%" stopColor="#ce93d8" />
-                      <stop offset="85%" stopColor="#f8bbd0" />
-                      <stop offset="100%" stopColor="#fce4ec" />
-                    </linearGradient>
-                    {/* Pearlescent shimmer overlay */}
-                    <linearGradient id="pearlShimmer" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="rgba(255,255,255,0)" />
-                      <stop offset="40%" stopColor="rgba(255,255,255,0.4)" />
-                      <stop offset="50%" stopColor="rgba(255,255,255,0.6)" />
-                      <stop offset="60%" stopColor="rgba(255,255,255,0.4)" />
-                      <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-                      <animate attributeName="x1" values="-100%;200%" dur="3s" repeatCount="indefinite"/>
-                    </linearGradient>
-                    {/* 3D bevel effect */}
-                    <filter id="crystalBevel">
-                      <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/>
-                      <feSpecularLighting in="blur" surfaceScale="5" specularConstant="0.8" specularExponent="20" result="spec">
-                        <fePointLight x="200" y="50" z="200"/>
-                      </feSpecularLighting>
-                      <feComposite in="spec" in2="SourceAlpha" operator="in" result="specOut"/>
-                      <feMerge>
-                        <feMergeNode in="SourceGraphic"/>
-                        <feMergeNode in="specOut"/>
-                      </feMerge>
-                    </filter>
-                    {/* Outer glow */}
-                    <filter id="crystalGlow">
-                      <feGaussianBlur stdDeviation="5" result="blur"/>
-                      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.3  0 0.4 0 0 0  0 0 0.6 0 0  0 0 0 1 0"/>
-                      <feMerge>
-                        <feMergeNode/>
-                        <feMergeNode in="SourceGraphic"/>
-                      </feMerge>
-                    </filter>
-                    {/* Text shadow for depth */}
-                    <filter id="textShadow">
-                      <feDropShadow dx="2" dy="4" stdDeviation="3" floodColor="rgba(0,0,0,0.4)"/>
-                    </filter>
-                  </defs>
-
-                  {/* Background glow oval */}
-                  <ellipse cx="400" cy="140" rx="350" ry="90" fill="rgba(244,114,182,0.12)" filter="url(#crystalGlow)">
-                    <animate attributeName="rx" values="320;380;320" dur="2.5s" repeatCount="indefinite"/>
-                  </ellipse>
-
-                  {/* "HAPPY BIRTHDAY" - main line */}
-                  <text x="400" y="110" textAnchor="middle"
-                    fontFamily="Georgia, 'Times New Roman', serif" fontWeight="900" fontSize="58"
-                    fill="url(#crystalGrad)" filter="url(#textShadow)"
-                    letterSpacing="0.06em">
-                    <animate attributeName="fontSize" values="56;62;56" dur="2s" repeatCount="indefinite"/>
-                    HAPPY BIRTHDAY
-                  </text>
-
-                  {/* Pearlescent shimmer overlay on text */}
-                  <text x="400" y="110" textAnchor="middle"
-                    fontFamily="Georgia, 'Times New Roman', serif" fontWeight="900" fontSize="58"
-                    fill="url(#pearlShimmer)" letterSpacing="0.06em">
-                    HAPPY BIRTHDAY
-                  </text>
-
-                  {/* "DEVANSHII" - second line */}
-                  <text x="400" y="185" textAnchor="middle"
-                    fontFamily="Georgia, 'Times New Roman', serif" fontWeight="900" fontSize="48"
-                    fill="url(#crystalGrad)" filter="url(#textShadow)"
-                    letterSpacing="0.12em">
-                    <animate attributeName="fontSize" values="46;52;46" dur="2s" repeatCount="indefinite"/>
-                    DEVANSHII
-                  </text>
-
-                  {/* Pearlescent shimmer on second line */}
-                  <text x="400" y="185" textAnchor="middle"
-                    fontFamily="Georgia, 'Times New Roman', serif" fontWeight="900" fontSize="48"
-                    fill="url(#pearlShimmer)" letterSpacing="0.12em">
-                    DEVANSHII
-                  </text>
-
-                  {/* Decorative sparkles around text */}
-                  <text x="120" y="80" fontSize="20" fill="#ffd700" opacity="0.8">✦</text>
-                  <text x="680" y="80" fontSize="20" fill="#ffd700" opacity="0.8">✦</text>
-                  <text x="100" y="200" fontSize="16" fill="#f472b6" opacity="0.7">✧</text>
-                  <text x="700" y="200" fontSize="16" fill="#f472b6" opacity="0.7">✧</text>
-                  <text x="200" y="50" fontSize="14" fill="#ffd700" opacity="0.6">✦</text>
-                  <text x="600" y="50" fontSize="14" fill="#ffd700" opacity="0.6">✦</text>
-                </svg>
-              </div>
-
-              {/* ── Ornate rose gold crown below text ── */}
-              <div className="celebration-crown">
-                <svg viewBox="0 0 200 120" width="160" height="96">
-                  <defs>
-                    <linearGradient id="crownGold" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#ffd700" />
-                      <stop offset="30%" stopColor="#ffb300" />
-                      <stop offset="60%" stopColor="#ff8f00" />
-                      <stop offset="100%" stopColor="#ff6f00" />
-                    </linearGradient>
-                    <linearGradient id="crownRose" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#fce4ec" />
-                      <stop offset="30%" stopColor="#f8bbd0" />
-                      <stop offset="60%" stopColor="#f48fb1" />
-                      <stop offset="100%" stopColor="#f06292" />
-                    </linearGradient>
-                    <filter id="crownGlow">
+                    <filter id="starGlowGlass">
                       <feGaussianBlur stdDeviation="2" result="blur"/>
                       <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
                     </filter>
                   </defs>
-                  {/* Crown base */}
-                  <path d="M 20 100 L 20 60 L 40 40 L 60 55 L 80 30 L 100 50 L 120 30 L 140 55 L 160 40 L 180 60 L 180 100 Z"
-                    fill="url(#crownGold)" stroke="#ff8f00" strokeWidth="2" filter="url(#crownGlow)"/>
-                  {/* Crown band */}
-                  <rect x="20" y="85" width="160" height="15" rx="3" fill="url(#crownGold)" stroke="#ff8f00" strokeWidth="1"/>
-                  {/* Crown band decoration */}
-                  <rect x="20" y="88" width="160" height="3" fill="#fff5e6" opacity="0.5"/>
-                  {/* Pearls on crown points */}
-                  <circle cx="40" cy="40" r="5" fill="url(#crownRose)" stroke="#f48fb1" strokeWidth="1"/>
-                  <circle cx="80" cy="30" r="6" fill="url(#crownRose)" stroke="#f48fb1" strokeWidth="1"/>
-                  <circle cx="120" cy="30" r="6" fill="url(#crownRose)" stroke="#f48fb1" strokeWidth="1"/>
-                  <circle cx="160" cy="40" r="5" fill="url(#crownRose)" stroke="#f48fb1" strokeWidth="1"/>
-                  {/* Pink gemstones */}
-                  <circle cx="60" cy="55" r="4" fill="#e040fb" stroke="#ce93d8" strokeWidth="1"/>
-                  <circle cx="100" cy="50" r="5" fill="#e040fb" stroke="#ce93d8" strokeWidth="1"/>
-                  <circle cx="140" cy="55" r="4" fill="#e040fb" stroke="#ce93d8" strokeWidth="1"/>
-                  {/* Center large gem */}
-                  <circle cx="100" cy="50" r="7" fill="#e040fb" stroke="#ce93d8" strokeWidth="1.5">
-                    <animate attributeName="r" values="6;8;6" dur="1.5s" repeatCount="indefinite"/>
-                  </circle>
-                  {/* Gem sparkle */}
-                  <circle cx="98" cy="48" r="2" fill="white" opacity="0.8">
-                    <animate attributeName="opacity" values="0.3;1;0.3" dur="1s" repeatCount="indefinite"/>
-                  </circle>
-                  {/* Small diamonds on band */}
-                  <circle cx="50" cy="92" r="2.5" fill="#fff5e6" opacity="0.8"/>
-                  <circle cx="80" cy="92" r="2.5" fill="#fff5e6" opacity="0.8"/>
-                  <circle cx="100" cy="92" r="3" fill="#fff5e6" opacity="0.9"/>
-                  <circle cx="120" cy="92" r="2.5" fill="#fff5e6" opacity="0.8"/>
-                  <circle cx="150" cy="92" r="2.5" fill="#fff5e6" opacity="0.8"/>
+                  <polygon points="50,10 60,35 90,35 67,55 77,85 50,65 23,85 33,55 10,35 40,35" 
+                    fill="url(#starGradGlass)" filter="url(#starGlowGlass)" stroke="#ffd700" strokeWidth="1" opacity="0.7">
+                    <animate attributeName="opacity" values="0.5;0.8;0.5" dur="2s" repeatCount="indefinite"/>
+                  </polygon>
                 </svg>
               </div>
 
-              {/* ── Party poppers flanking the crown ── */}
-              <div className="celebration-popper-left">
-                <svg viewBox="0 0 50 80" width="40" height="64">
-                  <defs>
-                    <linearGradient id="popperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#f8bbd0" />
-                      <stop offset="50%" stopColor="#f472b6" />
-                      <stop offset="100%" stopColor="#e040fb" />
-                    </linearGradient>
-                  </defs>
-                  {/* Popper body */}
-                  <path d="M 15 80 L 15 30 Q 15 20 25 15 L 30 10 L 35 15 Q 35 20 35 30 L 35 80 Z"
-                    fill="url(#popperGrad)" stroke="#ce93d8" strokeWidth="1"/>
-                  {/* Popper top */}
-                  <rect x="22" y="5" width="6" height="12" rx="2" fill="#ffd700" stroke="#ff8f00" strokeWidth="0.5"/>
-                  {/* Burst trail */}
-                  <text x="25" y="8" fontSize="10" fill="#ffd700">✦</text>
-                  <text x="10" y="12" fontSize="8" fill="#f472b6">💎</text>
-                  <text x="35" y="6" fontSize="7" fill="#ffd700">⭐</text>
-                  <text x="5" y="5" fontSize="6" fill="#f48fb1">🎀</text>
-                </svg>
-              </div>
-              <div className="celebration-popper-right">
-                <svg viewBox="0 0 50 80" width="40" height="64">
-                  <defs>
-                    <linearGradient id="popperGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#e1bee7" />
-                      <stop offset="50%" stopColor="#ce93d8" />
-                      <stop offset="100%" stopColor="#ab47bc" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M 15 80 L 15 30 Q 15 20 25 15 L 30 10 L 35 15 Q 35 20 35 30 L 35 80 Z"
-                    fill="url(#popperGrad2)" stroke="#ce93d8" strokeWidth="1"/>
-                  <rect x="22" y="5" width="6" height="12" rx="2" fill="#ffd700" stroke="#ff8f00" strokeWidth="0.5"/>
-                  <text x="25" y="8" fontSize="10" fill="#ffd700">✦</text>
-                  <text x="38" y="12" fontSize="8" fill="#ce93d8">💎</text>
-                  <text x="8" y="6" fontSize="7" fill="#ffd700">⭐</text>
-                  <text x="40" y="5" fontSize="6" fill="#f48fb1">🎀</text>
-                </svg>
+              {/* ── "Happy Birthday" text (elegant serif, smaller) ── */}
+              <div className="glassmorphic-hb animate-hbSlideIn">
+                <span>Happy Birthday</span>
               </div>
 
-              {/* ── Floating jewels and bows around crown ── */}
-              <div className="celebration-crown-jewel" style={{ bottom: '-10px', left: '-20px', animationDelay: '0.3s' }}>💎</div>
-              <div className="celebration-crown-jewel" style={{ bottom: '-5px', right: '-15px', animationDelay: '0.5s' }}>🎀</div>
-              <div className="celebration-crown-jewel" style={{ bottom: '15px', left: '-35px', animationDelay: '0.7s', fontSize: '14px' }}>⭐</div>
-              <div className="celebration-crown-jewel" style={{ bottom: '10px', right: '-30px', animationDelay: '0.4s', fontSize: '12px' }}>🩷</div>
+              {/* ── "Devanshii" main focal point (luxury script, 2.5x larger) ── */}
+              <div className="glassmorphic-name-wrapper animate-nameReveal">
+                <div className="glassmorphic-name">
+                  Devanshii
+                </div>
+                {/* Gold outline glow layer */}
+                <div className="glassmorphic-name-glow" />
+              </div>
 
-              {/* ── Sparkle particles scattered around ── */}
-              {Array.from({length:20}).map((_,i)=>(
-                <div key={`sparkle-${i}`} className="celebration-sparkle"
-                  style={{
-                    left: `${-40 + Math.random()*80}%`,
-                    top: `${-40 + Math.random()*80}%`,
-                    fontSize: `${8 + Math.random()*12}px`,
-                    animationDelay: `${i*0.1}s`,
-                    animationDuration: `${1.5 + Math.random()*1}s`,
-                  }}>✨</div>
-              ))}
+              {/* ── Subtitle ── */}
+              <div className="glassmorphic-subtitle animate-subtitleFade">
+                ✨ Wishing you endless happiness, love and beautiful moments always. ✨
+              </div>
+
+              {/* ── Decorative sparkles flanking the name ── */}
+              <div className="glassmorphic-sparkle-left animate-sparkleFloat" style={{ animationDelay: '1.8s' }}>✨</div>
+              <div className="glassmorphic-sparkle-right animate-sparkleFloat" style={{ animationDelay: '2s' }}>✨</div>
+
+              {/* ── Small floating butterflies ── */}
+              <div className="glassmorphic-butterfly-1 animate-butterfly">🦋</div>
+              <div className="glassmorphic-butterfly-2 animate-butterfly" style={{ animationDelay: '2.5s' }}>🦋</div>
             </div>
           </div>
         )}
