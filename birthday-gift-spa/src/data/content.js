@@ -76,7 +76,9 @@ const content = {
     secretMessage: {
       header: '🎀 A Secret Message',
       subtext: 'Scratch to reveal your surprise 🤫',
-      message: "Hey you 🎀 I don't say this enough, but having you in my life is one of the best things that's ever happened to me. You make everything more fun, more warm, and more real. Thank you for being my person. Happy Birthday, Devu 💞🤗",
+      message: `Hey Devanshii 🎀
+Thank you for being the kind of person who turns ordinary moments into unforgettable memories. Your kindness, laughter, and endless positivity make life so much brighter. I hope this year brings you as much happiness as you've brought into the lives of everyone around you. Never stop being the amazing person you are.
+Happy Birthday, Devu 💞🤗!`,
       photos: [
         'https://picsum.photos/seed/secret1/400/500',
         'https://picsum.photos/seed/secret2/400/500',

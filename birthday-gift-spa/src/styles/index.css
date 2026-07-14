@@ -1450,12 +1450,13 @@
 
 .secret-letter-message p {
   font-family: 'Georgia', 'Times New Roman', serif;
-  font-size: 0.85rem;
+  font-size: 1.1rem;
   line-height: 1.7;
   color: #6b5040;
   letter-spacing: 0.02em;
   max-width: 90%;
   margin: 0 auto;
+  white-space: pre-wrap;
 }
 
 @media (max-width: 640px) {
@@ -1465,7 +1466,8 @@
     max-width: 95vw !important;
   }
   .secret-letter-message p {
-    font-size: 0.78rem !important;
+    font-size: 0.95rem !important;
+    white-space: pre-wrap;
   }
 }
 
