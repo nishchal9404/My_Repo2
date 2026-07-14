@@ -286,7 +286,7 @@ const CakeCut = ({ onDone }) => {
   // Cake dimensions matching reference image proportions.
   // Reference: cake occupies ~24% of the full image frame.
   // Width scales with viewport; height derived from cake's natural aspect ratio (677:369).
-  const W = Math.min(window.innerWidth * 0.8, 650);
+  const W = Math.min(window.innerWidth * 1.0, 900);
   const H = Math.round(W * (369 / 677));
   const HALF = Math.round(W / 2);
 
@@ -897,84 +897,294 @@ const OurSongs = ({ onBack, bgAudioRef: externalBgAudioRef }) => {
   );
 };
 
-// ── Secret Message ───────────────────────────────────────────────────────────────
+// ── Secret Message (Premium Redesign) ─────────────────────────────────────────
 const SecretMessage = ({ onBack }) => {
-  const { header, subtext, message } = content.interactions.secretMessage;
-  const canvasRef = useRef(null);
-  const [done, setDone] = useState(false);
+  const { header, subtext, message, photos, captions } = content.interactions.secretMessage;
+  
+  // State machine: 'envelope' → 'opening' → 'letter' → 'scratch' → 'revealed'
+  const [phase, setPhase] = useState('envelope');
+  const [envelopeOpen, setEnvelopeOpen] = useState(false);
+  const [letterOut, setLetterOut] = useState(false);
+  const [scratchDone, setScratchDone] = useState(false);
   const drawing = useRef(false);
+  const scratchContainerRef = useRef(null);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#f48fb1';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgba(255,255,255,0.2)';
-    for (let i = 0; i < 12; i++) {
-      ctx.font = '20px serif';
-      ctx.fillText('🎀', Math.random() * canvas.width, Math.random() * canvas.height);
-    }
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 16px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Scratch me! 😏', canvas.width / 2, canvas.height / 2);
-  }, []);
-
-  const scratch = (e) => {
-    if (!drawing.current) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX ?? e.touches?.[0]?.clientX) - rect.left;
-    const y = (e.clientY ?? e.touches?.[0]?.clientY) - rect.top;
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.beginPath();
-    ctx.arc(x, y, 22, 0, Math.PI * 2);
-    ctx.fill();
-
-    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    const total = pixels.length / 4;
-    const transparent = pixels.filter((_, i) => i % 4 === 3 && pixels[i] === 0).length;
-    const pct = Math.round((transparent / total) * 100);
-    if (pct > 60 && !done) setDone(true);
+  // ── Open envelope sequence ──
+  const openEnvelope = () => {
+    setPhase('opening');
+    setTimeout(() => setEnvelopeOpen(true), 300);
+    setTimeout(() => setLetterOut(true), 900);
+    setTimeout(() => setPhase('letter'), 1400);
   };
 
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-6" {...BG}>
-      <h1 className="text-white text-3xl font-bold">{header}</h1>
-      <p className="text-pink-200">{subtext}</p>
+  // ── Initialize scratch canvas when letter phase starts ──
+  useEffect(() => {
+    if (phase !== 'letter' || scratchDone) return;
+    const timer = setTimeout(() => {
+      const container = scratchContainerRef.current;
+      if (!container || container.querySelector('canvas')) return;
+      
+      const rect = container.getBoundingClientRect();
+      const canvas = document.createElement('canvas');
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none;border-radius:16px;';
+      const ctx = canvas.getContext('2d');
 
-      <div className="relative w-96 h-64 rounded-2xl overflow-hidden shadow-2xl select-none secret-canvas-wrapper">
-        <div className="absolute inset-0 bg-white/10 flex items-center justify-center p-4">
-          <p className="text-white text-center text-sm font-medium leading-relaxed">{message}</p>
+      // Silver scratch layer (simplified - no noise to keep it clean)
+      const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      grad.addColorStop(0, '#d4d4d4');
+      grad.addColorStop(0.3, '#e8e8e8');
+      grad.addColorStop(0.5, '#f0f0f0');
+      grad.addColorStop(0.7, '#e8e8e8');
+      grad.addColorStop(1, '#d4d4d4');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // "✨ Scratch to Reveal ✨" text
+      ctx.fillStyle = 'rgba(120,120,120,0.7)';
+      ctx.font = 'bold 18px "Playfair Display", Georgia, serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('✨ Scratch to Reveal ✨', canvas.width / 2, canvas.height / 2);
+
+      // Thin border
+      ctx.strokeStyle = 'rgba(180,180,180,0.3)';
+      ctx.lineWidth = 1;
+      ctx.roundRect(2, 2, canvas.width - 4, canvas.height - 4, 14);
+      ctx.stroke();
+
+      container.appendChild(canvas);
+
+      // ── Progress tracking ──
+      // Use a small offscreen canvas (50x50) for fast progress checking
+      const progCanvas = document.createElement('canvas');
+      progCanvas.width = 50;
+      progCanvas.height = 50;
+      const progCtx = progCanvas.getContext('2d');
+
+      // Position tracking for reliable progress estimation
+      const totalPixels = canvas.width * canvas.height;
+      const brushArea = Math.PI * 20 * 20; // ~1256 px² per stroke
+      // With ~50% overlap, we need about totalPixels / (brushArea * 0.5) strokes
+      // to cover 34% of the canvas
+      const targetCoverage = totalPixels * 0.34;
+      const strokesNeeded = Math.round(targetCoverage / (brushArea * 0.5));
+      
+      let strokeCount = 0;
+
+      const doScratch = (pos) => {
+        if (!drawing.current || scratchDone) return;
+        const c = canvas.getContext('2d');
+        c.globalCompositeOperation = 'destination-out';
+        c.beginPath();
+        c.arc(pos.x, pos.y, 20, 0, Math.PI * 2);
+        c.fill();
+
+        strokeCount++;
+        // Check progress every ~10 strokes via downsampled pixel analysis
+        if (strokeCount % 10 === 0 || strokeCount >= strokesNeeded) {
+          progCtx.clearRect(0, 0, 50, 50);
+          progCtx.drawImage(canvas, 0, 0, 50, 50);
+          const pd = progCtx.getImageData(0, 0, 50, 50).data;
+          let clearedPx = 0;
+          for (let i = 3; i < pd.length; i += 4) {
+            if (pd[i] < 240) clearedPx++;
+          }
+          const pct = Math.round((clearedPx / 2500) * 100);
+          
+          if (pct >= 28) {
+            // Reveal!
+            c.globalCompositeOperation = 'destination-out';
+            c.fillStyle = 'rgba(0,0,0,1)';
+            c.fillRect(0, 0, canvas.width, canvas.height);
+            setScratchDone(true);
+          }
+        }
+      };
+
+      const getPos = (e) => {
+        const r = canvas.getBoundingClientRect();
+        return {
+          x: ((e.clientX ?? e.touches?.[0]?.clientX) - r.left) * (canvas.width / r.width),
+          y: ((e.clientY ?? e.touches?.[0]?.clientY) - r.top) * (canvas.height / r.height)
+        };
+      };
+
+      const onStart = (e) => { drawing.current = true; doScratch(getPos(e)); };
+      const onMove = (e) => { doScratch(getPos(e)); };
+      const onEnd = () => { drawing.current = false; };
+
+      canvas.addEventListener('mousedown', onStart);
+      canvas.addEventListener('mousemove', onMove);
+      canvas.addEventListener('mouseup', onEnd);
+      canvas.addEventListener('mouseleave', onEnd);
+      canvas.addEventListener('touchstart', onStart, { passive: true });
+      canvas.addEventListener('touchmove', onMove, { passive: true });
+      canvas.addEventListener('touchend', onEnd);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [phase, scratchDone]);
+
+  // Cleanup canvas on unmount
+  useEffect(() => {
+    return () => {
+      if (scratchContainerRef.current) {
+        scratchContainerRef.current.querySelectorAll('canvas').forEach(c => c.remove());
+      }
+    };
+  }, []);
+
+  // Photo rotations for polaroid display
+  const photoRotations = ['-4deg', '5deg', '-3deg'];
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-6 sm:gap-6 sm:p-8"
+      style={{ background: 'linear-gradient(160deg,#2d0036 0%,#1a0028 40%,#0d001a 100%)', minHeight: '100vh' }}>
+      
+      {/* ── Floating hearts background ── */}
+      {Array.from({length:10}).map((_,i)=>(
+        <div key={`bg-heart-${i}`} className="absolute pointer-events-none"
+          style={{ left:`${5 + i*10}%`, top:`${5 + ((i*23)%90)}%`,
+            fontSize:`${10 + (i%4)*8}px`, opacity:0.12 + (i%3)*0.04,
+            animation:`float ${2.8 + (i%3)*0.6}s ease-in-out infinite`,
+            animationDelay:`${(i*0.35)%2}s` }}>🩷</div>
+      ))}
+      
+      {/* ── Tiny sparkle particles ── */}
+      {Array.from({length:6}).map((_,i)=>(
+        <div key={`bg-sparkle-${i}`} className="absolute pointer-events-none text-xs"
+          style={{ left:`${10 + i*16}%`, top:`${3 + ((i*31)%80)}%`,
+            opacity:0.15 + (i%3)*0.05,
+            animation:`sparkleTwinkle ${1.8 + i*0.3}s ease-in-out infinite`,
+            animationDelay:`${i*0.4}s` }}>✨</div>
+      ))}
+
+      <h1 className="text-white text-2xl sm:text-3xl font-bold tracking-wider z-10">{header}</h1>
+      <p className="text-pink-200/80 text-sm sm:text-base z-10">{subtext}</p>
+
+      {/* ── MAIN LAYOUT: Left = Polaroids | Right = Envelope/Letter ── */}
+      <div className="relative z-10 flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-10 w-full max-w-5xl">
+
+        {/* ── LEFT SIDE: 3 large Polaroid photos arranged in staggered row ── */}
+        <div className="relative flex flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 w-full lg:w-auto">
+          {photos.map((src, i) => {
+            const vertOffsets = [0, 20, 8];
+            return (
+              <div key={`photo-${i}`} className="secret-polaroid"
+                style={{
+                  '--polaroid-rot': photoRotations[i],
+                  animation: `polaroidFloat ${3 + i * 0.4}s ease-in-out infinite`,
+                  animationDelay: `${i * 0.3}s`,
+                  zIndex: 10 - i,
+                  marginTop: `${vertOffsets[i]}px`,
+                }}>
+                <div className="secret-polaroid-clip">
+                  <svg width="22" height="22" viewBox="0 0 22 22">
+                    <rect x="8" y="0" width="6" height="22" rx="2" fill="#c0c0c0" opacity="0.7" transform="rotate(-15, 11, 11)" />
+                    <circle cx="11" cy="5" r="3" fill="#d4d4d4" opacity="0.5" />
+                  </svg>
+                </div>
+                <div className="secret-polaroid-card">
+                  <img src={src} alt={`memory ${i + 1}`} className="secret-polaroid-img" />
+                  <p className="secret-polaroid-caption">{captions[i]}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
-        <canvas
-          ref={canvasRef}
-          width={384} height={256}
-          className="absolute inset-0 cursor-pointer touch-none"
-          onMouseDown={() => drawing.current = true}
-          onMouseUp={() => drawing.current = false}
-          onMouseLeave={() => drawing.current = false}
-          onMouseMove={scratch}
-          onTouchStart={() => drawing.current = true}
-          onTouchEnd={() => drawing.current = false}
-          onTouchMove={scratch}
-        />
+
+        {/* ── RIGHT SIDE: Envelope / Letter ── */}
+        <div className="secret-right-section">
+          
+          {/* ── ENVELOPE STATE ── */}
+          {phase === 'envelope' && (
+            <div className="flex flex-col items-center gap-5">
+              <div className="secret-envelope-wrapper animate-envelopeFloat">
+                <div className="secret-env-sparkle" style={{ top: '-15px', left: '-10px', animationDelay: '0s' }}>✨</div>
+                <div className="secret-env-sparkle" style={{ top: '-8px', right: '-12px', animationDelay: '0.3s' }}>💎</div>
+                <div className="secret-env-sparkle" style={{ bottom: '-10px', left: '5px', animationDelay: '0.6s' }}>🩷</div>
+                <div className="secret-env-sparkle" style={{ bottom: '-5px', right: '-8px', animationDelay: '0.9s' }}>✨</div>
+                
+                <div className="secret-envelope">
+                  <div className="secret-env-back" />
+                  <div className="secret-env-flap" />
+                  <div className="secret-env-body">
+                    <div className="secret-env-heart-seal">💖</div>
+                  </div>
+                  <div className="secret-env-front" />
+                </div>
+              </div>
+
+              <button onClick={openEnvelope} className="secret-open-btn">
+                Open Secret Letter 💌
+              </button>
+            </div>
+          )}
+
+          {/* ── OPENING ANIMATION ── */}
+          {phase === 'opening' && (
+            <div className="flex flex-col items-center justify-center gap-4" style={{ minWidth: 280 }}>
+              <div className="secret-envelope-wrapper" style={{ transform: envelopeOpen ? 'scale(1.05)' : 'scale(1)', transition: 'transform 0.4s ease' }}>
+                <div className="secret-envelope secret-envelope-opening">
+                  <div className="secret-env-back" />
+                  <div className="secret-env-flap"
+                    style={{ transform: envelopeOpen ? 'rotateX(180deg)' : 'rotateX(0deg)', transformOrigin: 'top', transition: 'transform 0.6s cubic-bezier(0.34,1.56,0.64,1)' }} />
+                  <div className="secret-env-body" style={{ overflow: 'visible' }}>
+                    <div className="secret-env-heart-seal"
+                      style={{ opacity: envelopeOpen ? 0 : 1, transform: envelopeOpen ? 'scale(2)' : 'scale(1)', transition: 'all 0.4s ease' }}>💖</div>
+                    <div className="secret-letter-peek"
+                      style={{ transform: letterOut ? 'translateY(0)' : 'translateY(100%)', opacity: letterOut ? 1 : 0, transition: 'transform 0.6s cubic-bezier(0.22,1.2,0.36,1) 0.2s, opacity 0.3s ease 0.2s' }}>
+                      <div className="text-xs text-pink-400 font-serif italic">💌</div>
+                    </div>
+                  </div>
+                  <div className="secret-env-front" style={{ opacity: envelopeOpen ? 0 : 1, transition: 'opacity 0.3s ease' }} />
+                </div>
+              </div>
+              {letterOut && (
+                <div className="flex gap-2 text-lg">
+                  <span className="animate-float" style={{ animationDelay: '0s' }}>✨</span>
+                  <span className="animate-float" style={{ animationDelay: '0.2s' }}>🩷</span>
+                  <span className="animate-float" style={{ animationDelay: '0.4s' }}>✨</span>
+                  <span className="animate-float" style={{ animationDelay: '0.6s' }}>💎</span>
+                  <span className="animate-float" style={{ animationDelay: '0.8s' }}>✨</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── LETTER + SCRATCH STATE ── */}
+          {phase === 'letter' && (
+            <div className="flex flex-col items-center gap-4 w-full max-w-md">
+              <div className="secret-letter-paper animate-letterUnfold">
+                <div className="secret-letter-corner" style={{ top: '6px', left: '6px' }}>🌸</div>
+                <div className="secret-letter-corner" style={{ top: '6px', right: '6px' }}>🌷</div>
+                <div className="secret-letter-corner" style={{ bottom: '6px', left: '6px' }}>🌺</div>
+                <div className="secret-letter-corner" style={{ bottom: '6px', right: '6px' }}>🌸</div>
+                
+                <div className="absolute bottom-10 right-8 text-lg opacity-30" style={{ transform: 'rotate(-15deg)' }}>💖</div>
+                <div className="absolute top-12 left-8 text-xs opacity-20" style={{ transform: 'rotate(10deg)' }}>🎀</div>
+                
+                <div className="secret-letter-message">
+                  <p>{message}</p>
+                </div>
+
+                <div ref={scratchContainerRef} className="secret-scratch-zone" />
+              </div>
+
+              {scratchDone && (
+                <div className="flex gap-2 text-base">
+                  {Array.from({length:5}).map((_,i)=>(
+                    <span key={i} className="animate-float" style={{ animationDelay: `${i*0.15}s`, fontSize: `${14 + (i%3)*6}px` }}>🩷</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
-      {done && (
-        <div className="text-center animate-fade-in">
-          <div className="flex justify-center gap-2 text-2xl mb-2">
-            {['🎀','✨','🎀'].map((e, i) => (
-              <span key={i} className="animate-float" style={{ animationDelay: `${i * 0.2}s` }}>{e}</span>
-            ))}
-          </div>
-          <p className="text-white font-semibold text-base">Worth the scratch, wasn't it?</p>
-        </div>
-      )}
-
-      <button onClick={onBack} className="btn-secondary mt-2">← Back</button>
-
+      <button onClick={onBack} className="btn-secondary mt-2 z-10">← Back</button>
     </div>
   );
 };

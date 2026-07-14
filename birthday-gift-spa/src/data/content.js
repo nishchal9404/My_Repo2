@@ -76,7 +76,13 @@ const content = {
     secretMessage: {
       header: '🎀 A Secret Message',
       subtext: 'Scratch to reveal your surprise 🤫',
-      message: "Hey you 🎀 I don't say this enough, but having you in my life is one of the best things that's ever happened to me. You make everything more fun, more warm, and more real. Thank you for being my person. Happy Birthday, Devu 💞🤗"
+      message: "Hey you 🎀 I don't say this enough, but having you in my life is one of the best things that's ever happened to me. You make everything more fun, more warm, and more real. Thank you for being my person. Happy Birthday, Devu 💞🤗",
+      photos: [
+        'https://picsum.photos/seed/secret1/400/500',
+        'https://picsum.photos/seed/secret2/400/500',
+        'https://picsum.photos/seed/secret3/400/500'
+      ],
+      captions: ['Us being us 🌸', 'My favorite smile ✨', 'Always together 💕']
     },
     complimentGarden: {
       header: '🌸 Your Compliment Garden',
