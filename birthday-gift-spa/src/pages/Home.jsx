@@ -508,144 +508,98 @@ const PhotoString = () => {
 
   return (
     <div className="relative w-full photo-string-container" style={{ height: 320 }}>
+      {/* Floating background sparkles */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {[1,2,3,4,5,6,7,8].map((_, i) => (
+          <div key={`ps-${i}`} className="absolute text-xs animate-float"
+            style={{ left: `${5 + i * 12}%`, top: `${10 + ((i * 37) % 70)}%`, opacity: 0.15 + (i % 3) * 0.08, animationDelay: `${i * 0.25}s`, fontSize: `${12 + (i % 4) * 6}px` }}>
+            {['✨','🩷','⭐','💎','🌸','🩷','✨','⭐'][i]}
+          </div>
+        ))}
+      </div>
+
       <svg className="absolute inset-0 w-full" height="320" style={{ zIndex: 0 }} preserveAspectRatio="none">
         <defs>
-          {/* Warm glow filter for lights */}
           <filter id="warmGlow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="6" result="blur" />
             <feColorMatrix in="blur" type="matrix"
               values="1 0 0 0 0.3  0 0.6 0 0 0.1  0 0 0.2 0 0  0 0 0 1 0" />
-            <feMerge>
-              <feMergeNode />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
+            <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
-          {/* Stronger glow for bulbs */}
           <filter id="bulbGlow" x="-100%" y="-100%" width="300%" height="300%">
             <feGaussianBlur stdDeviation="8" result="blur" />
             <feColorMatrix in="blur" type="matrix"
               values="1 0 0 0 0.4  0 0.7 0 0 0.15  0 0 0.3 0 0  0 0 0 1 0" />
-            <feMerge>
-              <feMergeNode />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
+            <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
-          {/* Rope texture gradient */}
           <linearGradient id="ropeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#8b5a2b" />
-            <stop offset="50%" stopColor="#5c3a1e" />
-            <stop offset="100%" stopColor="#3d2512" />
+            <stop offset="0%" stopColor="#d4a96a" /><stop offset="50%" stopColor="#8b5a2b" /><stop offset="100%" stopColor="#5c3a1e" />
           </linearGradient>
         </defs>
 
-        {/* ── Thin brown wire with waves (where photos hang from) ── */}
-        {/* Wire shadow/depth */}
-        <path
-          d="M 2% 15 Q 8% 12, 15% 15 Q 22% 18, 30% 15 Q 38% 12, 45% 15 Q 52% 18, 60% 15 Q 68% 12, 75% 15 Q 82% 18, 90% 15 Q 95% 13, 98% 15"
-          fill="none"
-          stroke="#3d2512"
-          strokeWidth="3.5"
-          strokeLinecap="round"
-          opacity="0.4"
-        />
-        {/* Main wire body */}
-        <path
-          d="M 2% 15 Q 8% 12, 15% 15 Q 22% 18, 30% 15 Q 38% 12, 45% 15 Q 52% 18, 60% 15 Q 68% 12, 75% 15 Q 82% 18, 90% 15 Q 95% 13, 98% 15"
-          fill="none"
-          stroke="#6b341a"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          opacity="0.9"
-        />
-        {/* Wire highlight */}
-        <path
-          d="M 2% 15 Q 8% 12, 15% 15 Q 22% 18, 30% 15 Q 38% 12, 45% 15 Q 52% 18, 60% 15 Q 68% 12, 75% 15 Q 82% 18, 90% 15 Q 95% 13, 98% 15"
-          fill="none"
-          stroke="#8b5a2b"
-          strokeWidth="0.8"
-          strokeLinecap="round"
-          opacity="0.5"
-        />
+        {/* Decorative ribbon/wire */}
+        <path d="M 0% 18 Q 10% 14, 20% 18 Q 30% 22, 40% 18 Q 50% 14, 60% 18 Q 70% 22, 80% 18 Q 90% 14, 100% 18"
+          fill="none" stroke="#d4a96a" strokeWidth="3.5" strokeLinecap="round" opacity="0.6" />
+        <path d="M 0% 18 Q 10% 14, 20% 18 Q 30% 22, 40% 18 Q 50% 14, 60% 18 Q 70% 22, 80% 18 Q 90% 14, 100% 18"
+          fill="none" stroke="#ffd700" strokeWidth="1.2" strokeLinecap="round" opacity="0.4" />
 
-        {/* ── Warm fairy lights attached to wire ── */}
+        {/* Warm fairy lights */}
         {Array.from({ length: 20 }).map((_, i) => {
           const t = i / 19;
           const x = 2 + t * 96;
-          const y = 15;
-          
-          // Alternating light sizes and brightness
+          const y = 18;
           const isLarge = i % 3 === 0;
           const baseRadius = isLarge ? 5 : 3.5;
           const radius = mounted ? baseRadius : 0;
           const glowRadius = radius * 2.5;
           const opacity = 0.7 + (i % 4) * 0.1;
-          const hue = i % 5 === 0 ? '#ff6b9d' : i % 5 === 1 ? '#ffd700' : i % 5 === 2 ? '#ffb86b' : i % 5 === 3 ? '#ff9ecd' : '#ffcc80';
+          const hues = ['#ff6b9d','#ffd700','#ffb86b','#ff9ecd','#ffcc80','#a78bfa','#34d399','#f472b6'];
+          const hue = hues[i % hues.length];
           
           return (
             <g key={`light-${i}`} style={{ animation: mounted ? `lightPulse ${1.8 + (i % 3) * 0.4}s ease-in-out infinite` : 'none', animationDelay: `${i * 0.15}s` }}>
-              {/* Outer glow */}
               <circle cx={`${x}%`} cy={`${y}%`} r={glowRadius} fill={hue} opacity={opacity * 0.25} filter="url(#bulbGlow)" />
-              {/* Middle glow */}
               <circle cx={`${x}%`} cy={`${y}%`} r={radius * 1.6} fill="#fff5e6" opacity={opacity * 0.5} />
-              {/* Core bulb */}
               <circle cx={`${x}%`} cy={`${y}%`} r={radius} fill={hue} opacity={opacity} />
-              {/* Bright center */}
               <circle cx={`${x}%`} cy={`${y}%`} r={radius * 0.4} fill="#ffffff" opacity={opacity * 0.9} />
             </g>
           );
         })}
 
-        {/* ── Hanging straps from wire to photos ── */}
+        {/* Hanging straps */}
         {PHOTOS.map((_, i) => {
           const x = 8 + i * (84 / (PHOTOS.length - 1));
-          const y = 15;
-          const strapLength = 18; // Length of strap in percentage
           return (
             <g key={`strap-${i}`}>
-              {/* Thin hanging strap */}
-              <line x1={`${x}%`} y1={`${y}%`} x2={`${x}%`} y2={`${y + strapLength}%`}
-                stroke="#6b341a" strokeWidth="1.5" opacity="0.7" />
-              {/* Small clip at top connecting to wire */}
-              <circle cx={`${x}%`} cy={`${y}%`} r="2.5" fill="#d4a96a" stroke="#8b5a2b" strokeWidth="0.8" />
+              <line x1={`${x}%`} y1="18" x2={`${x}%`} y2="36" stroke="#d4a96a" strokeWidth="1.5" opacity="0.6" />
+              <circle cx={`${x}%`} cy="18" r="2.5" fill="#ffd700" stroke="#d4a96a" strokeWidth="0.8" opacity="0.8" />
             </g>
           );
         })}
       </svg>
 
-      {/* ── Photo cards hanging from wire ── */}
+      {/* Photo cards hanging */}
       <div className="absolute inset-0" style={{ zIndex: 1 }}>
         {PHOTOS.map((p, i) => {
           const x = 8 + i * (84 / (PHOTOS.length - 1));
-          const y = 18;
           return (
-            <div key={i}
-              className="absolute"
+            <div key={i} className="absolute"
               style={{
-                left: `${x}%`,
-                top: `${y}%`,
+                left: `${x}%`, top: `20%`,
                 transform: `translate(-50%, 0) rotate(${p.rot})`,
                 transformOrigin: 'top center',
                 animation: mounted ? `photoSway ${2.8 + i * 0.4}s ease-in-out infinite alternate` : 'none',
                 animationDelay: `${i * 0.3}s`,
-              }}
-            >
-              {/* Larger photo card */}
+              }}>
               <div className="photo-string-card"
                 style={{
-                  background: 'white',
-                  padding: 8,
-                  paddingBottom: 12,
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.15)',
-                  borderRadius: 4,
-                  width: 140,
-                  transform: 'translateX(-50%)',
-                }}
-              >
-                <img
-                  src={p.src}
-                  alt="memory"
-                  style={{ width: '100%', height: 120, objectFit: 'cover', display: 'block' }}
-                />
+                  background: 'white', padding: 6, paddingBottom: 10,
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.3)', borderRadius: 4,
+                  width: 130, transform: 'translateX(-50%)',
+                }}>
+                <div style={{ position: 'relative' }}>
+                  <img src={p.src} alt="memory" style={{ width: '100%', height: 110, objectFit: 'cover', display: 'block', borderRadius: 2 }} />
+                </div>
               </div>
             </div>
           );
@@ -655,25 +609,18 @@ const PhotoString = () => {
   );
 };
 
-
 const GiftHub = ({ onSelect, bgAudioRef: externalBgAudioRef }) => {
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const internalBgAudioRef = useRef(null);
-  
-  // Use external ref if provided, otherwise use internal
   const bgAudio = externalBgAudioRef || internalBgAudioRef;
 
-  // Background playlist — only set up the "ended" listener to advance songs.
-  // Music is already started from StagePrep's "PLAY MUSIC" button.
   useEffect(() => {
     const audioEl = bgAudio.current;
     if (!audioEl) return;
-
     const bgSongs = [
       '/songs/Lord_Huron_-_The_Night_We_Met__Official_Audio_(256k).mp3',
       '/songs/Stephen_Sanchez_Performs__Until_I_Found_You____We_Speak_Music(256k).mp3'
     ];
-
     const playNextSong = () => {
       setCurrentSongIndex(prev => {
         const nextIndex = (prev + 1) % bgSongs.length;
@@ -683,25 +630,27 @@ const GiftHub = ({ onSelect, bgAudioRef: externalBgAudioRef }) => {
         return nextIndex;
       });
     };
-
-    // Only attach ended listener — don't start playback (already started by StagePrep)
     audioEl.addEventListener('ended', playNextSong);
-
-    return () => {
-      audioEl.removeEventListener('ended', playNextSong);
-    };
+    return () => { audioEl.removeEventListener('ended', playNextSong); };
   }, []);
 
+  const giftBoxes = content.pages.giftHub.giftBoxes;
+
   return (
-    <div className="min-h-screen flex flex-col" {...BG}>
+    <div className="min-h-screen flex flex-col relative overflow-hidden" {...BG}>
       <PhotoString />
-      <div className="flex flex-col items-center justify-center flex-1 gap-6 p-6 pt-2">
-        <h1 className="text-white text-3xl font-bold tracking-widest">{content.pages.giftHub.header}</h1>
-        <p className="text-pink-200">{content.pages.giftHub.subtext}</p>
-        <div className="flex flex-wrap justify-center gap-6 mt-2">
-          {content.pages.giftHub.giftBoxes.map(gift => (
-            <button key={gift.id} onClick={() => onSelect(gift.id)} className="gift-card group">
-              <div className="text-6xl mb-3 group-hover:animate-wiggle transition-transform">{gift.emoji}</div>
+      
+      <div className="relative z-10 flex flex-col items-center justify-center flex-1 gap-6 p-6 pt-2">
+        <h1 className="text-white text-3xl md:text-4xl font-bold tracking-widest">{content.pages.giftHub.header}</h1>
+        <p className="text-pink-200/80 text-sm tracking-wide">{content.pages.giftHub.subtext}</p>
+
+        <div className="flex flex-wrap justify-center gap-5 mt-2">
+          {giftBoxes.map((gift) => (
+            <button key={gift.id} onClick={() => onSelect(gift.id)}
+              className="group flex flex-col items-center bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 w-36
+                         hover:bg-white/20 hover:border-white/40 active:scale-95 transition-all duration-200 cursor-pointer
+                         shadow-lg hover:shadow-xl">
+              <div className="text-5xl mb-3 group-hover:scale-110 transition-transform duration-200">{gift.emoji}</div>
               <p className="text-white font-semibold text-sm tracking-wide">{gift.label}</p>
             </button>
           ))}
@@ -750,6 +699,7 @@ const PhotoMemory = ({ onBack }) => {
         ))}
       </div>
 
+      <button onClick={onBack} className="btn-secondary mt-2">← Back</button>
     </div>
   );
 };
@@ -1469,6 +1419,7 @@ const LoveLetter = ({ onBack }) => {
           <div className="text-2xl text-center mb-4">💌</div>
           <pre className="whitespace-pre-wrap text-gray-700 font-serif text-sm leading-relaxed">{note}</pre>
           <div className="text-center mt-4 text-xl">🌹</div>
+          <button onClick={onBack} className="btn-secondary mt-4">← Back</button>
         </div>
       )}
 

@@ -1,6 +1,7 @@
 {
   "name": "birthday-gift-spa",
   "version": "1.0.0",
+  "type": "module",
   "description": "A highly interactive single-page web application for presenting digital birthday gifts.",
   "main": "src/main.jsx",
   "scripts": {
