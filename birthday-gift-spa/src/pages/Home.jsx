@@ -640,11 +640,11 @@ const GiftHub = ({ onSelect, bgAudioRef: externalBgAudioRef }) => {
     <div className="min-h-screen flex flex-col relative overflow-hidden" {...BG}>
       <PhotoString />
       
-      <div className="relative z-10 flex flex-col items-center justify-center flex-1 gap-6 p-6 pt-2">
-        <h1 className="text-white text-3xl md:text-4xl font-bold tracking-widest">{content.pages.giftHub.header}</h1>
-        <p className="text-pink-200/80 text-sm tracking-wide">{content.pages.giftHub.subtext}</p>
+      <div className="relative z-10 flex flex-col items-center justify-center flex-1 gap-4 p-6 pt-2">
+        <h1 className="text-white text-3xl md:text-4xl font-bold tracking-widest gift-hub-title">{content.pages.giftHub.header}</h1>
+        <p className="text-pink-200/80 text-sm tracking-wide gift-hub-subtitle">{content.pages.giftHub.subtext}</p>
 
-        <div className="flex flex-wrap justify-center gap-5 mt-2">
+        <div className="flex flex-wrap justify-center gap-5 mt-2 gift-hub-grid">
           {giftBoxes.map((gift) => (
             <button key={gift.id} onClick={() => onSelect(gift.id)}
               className="group flex flex-col items-center bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 w-36
