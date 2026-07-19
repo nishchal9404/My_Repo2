@@ -339,10 +339,10 @@ const CakeCut = ({ onDone }) => {
         {/* SINGLE INTACT CAKE — shown before and during the cut */}
         {(phase === 'idle' || phase === 'cutting') && (
           <img src="/cake2.png"
-            width={W} height={H}
-            style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }}
-            alt="cake"
-          />
+              width={W} height={H}
+              style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }}
+              alt="cake"
+            />
         )}
 
         {/* LEFT HALF — only appears after cutting, slides left */}
