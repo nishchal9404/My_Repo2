@@ -338,7 +338,7 @@ const CakeCut = ({ onDone }) => {
 
         {/* SINGLE INTACT CAKE — shown before and during the cut */}
         {(phase === 'idle' || phase === 'cutting') && (
-          <img src="/cake.png"
+          <img src="/cake2.png"
             width={W} height={H}
             style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }}
             alt="cake"
@@ -358,7 +358,7 @@ const CakeCut = ({ onDone }) => {
             transformOrigin: 'bottom left',
             opacity: phase === 'disappear' ? 0 : 1,
           }}>
-            <img src="/cake.png"
+            <img src="/cake2.png"
               width={W} height={H}
               style={{ display: 'block', width: W, height: H, maxWidth: 'none' }}
               alt="cake left half"
@@ -379,7 +379,7 @@ const CakeCut = ({ onDone }) => {
             transformOrigin: 'bottom right',
             opacity: phase === 'disappear' ? 0 : 1,
           }}>
-            <img src="/cake.png"
+            <img src="/cake2.png"
               width={W} height={H}
               style={{ display: 'block', width: W, height: H, maxWidth: 'none', marginLeft: -HALF }}
               alt="cake right half"
