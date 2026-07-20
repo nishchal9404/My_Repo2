@@ -3,6 +3,16 @@ import content from '../data/content.js';
 
 const BG = { style: { backgroundColor: '#f48fb1' } };
 
+const PASSCODE_BG = { 
+  style: { 
+    backgroundImage: 'url(/front_bg.jpg)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center center',
+    backgroundRepeat: 'no-repeat',
+    backgroundColor: '#f48fb1'
+  } 
+};
+
 // ── Passcode Lock ──────────────────────────────────────────────────────────────
 const PasscodeLock = ({ onUnlock }) => {
   const [input, setInput] = useState('');
@@ -36,7 +46,7 @@ const PasscodeLock = ({ onUnlock }) => {
   const del = () => setInput(i => i.slice(0, -1));
 
   return (
-    <div className="min-h-screen flex items-center justify-center" {...BG}>
+    <div className="min-h-screen flex items-center justify-center" {...PASSCODE_BG}>
       <div className="flex items-stretch w-full min-h-screen passcode-layout">
 
         {/* ── Polaroid — left half ── */}
@@ -56,7 +66,7 @@ const PasscodeLock = ({ onUnlock }) => {
                 transform: 'rotate(-2deg)' }}
               className="hover:rotate-0 hover:scale-105 transition-all duration-300"
             >
-              <img src="https://picsum.photos/seed/bday-p1/600/700" alt="memory"
+              <img src="/img1.jpeg" alt="memory"
                 style={{ width: '100%', height: '55vh', objectFit: 'cover', display: 'block' }} />
             </div>
           </div>
@@ -170,8 +180,28 @@ const Balloons = () => (
       const left = 2 + (i * 3.5) + (Math.sin(i * 2.3) * 2.5);
       const delay = (i * 0.18) % 2.8;
       const size = 32 + (i % 5) * 9;
+      const initialRot = `${-15 + (i % 3) * 10}deg`;
+      const midRot = `${-5 + (i % 4) * 5}deg`;
+      const finalRot = `${10 + (i % 3) * 8}deg`;
+      const swayDuration = `${4 + (i % 4) * 0.8}s`;
+      const swayDist = `${-15 + (i % 5) * 6}px`;
+
       return (
-        <div key={i} className="balloon" style={{ left: `${left}%`, animationDelay: `${delay}s`, '--bcolor': colors[i % colors.length], '--bsize': `${size}px` }} />
+        <div 
+          key={i} 
+          className="balloon" 
+          style={{
+            left: `${left}%`,
+            animationDelay: `${delay}s`,
+            '--bcolor': colors[i % colors.length],
+            '--bsize': `${size}px`,
+            '--initial-rot': initialRot,
+            '--mid-rot': midRot,
+            '--final-rot': finalRot,
+            '--sway-duration': swayDuration,
+            '--sway-dist': swayDist,
+          }} 
+        />
       );
     })}
   </div>
@@ -197,8 +227,8 @@ const StagePrep = ({ onCurtain, bgAudioRef }) => {
     // Remove the loop attribute so songs auto-advance
     audio.loop = false;
 
+    audio.volume = 0.15; // Increased volume
     audio.src = bgSongs[0];
-    audio.volume = 0.07;
     audio.play().catch(() => {});
 
     // When song ends, play next
@@ -206,13 +236,13 @@ const StagePrep = ({ onCurtain, bgAudioRef }) => {
       let songIndex = 0;
       // Find current song index from the src
       bgSongs.forEach((s, i) => {
-        if (audio.src.includes(s.replace('/songs/', '')) || audio.src.includes(s)) {
+        if (audio.src.includes(s.replace("/songs/", "")) || audio.src.includes(s)) {
           songIndex = i;
         }
       });
       const nextIndex = (songIndex + 1) % bgSongs.length;
       audio.src = bgSongs[nextIndex];
-      audio.volume = 0.07;
+      audio.volume = 0.15; // Increased volume
       audio.play().catch(() => {});
     };
   };
@@ -305,8 +335,17 @@ const CakeCut = ({ onDone }) => {
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center select-none relative overflow-hidden"
-      style={{ background: 'linear-gradient(160deg,#2d0036 0%,#1a0028 40%,#0d001a 100%)' }}
+      style={{
+        backgroundImage: 'url(/bg.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#1a0028'
+      }}
     >
+      {/* Responsive background overlay for better visibility */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/50 pointer-events-none" />
+      
       {Array.from({length:14}).map((_,i)=>(
         <div key={i} className="absolute text-xl pointer-events-none"
           style={{ left:`${4+i*7}%`, top:`${8+((i*41)%82)}%`,
@@ -314,6 +353,40 @@ const CakeCut = ({ onDone }) => {
             animation:`float ${2.4+(i%3)*0.9}s ease-in-out infinite`,
             animationDelay:`${(i*0.28)%2}s` }}>🌸</div>
       ))}
+
+      {/* Spidey2 - Upper Left Corner */}
+      <div className="absolute -top-4 -left-16 z-20 pointer-events-none"
+        style={{
+          width: 'clamp(220px, 30vw, 450px)',
+          height: 'auto',
+          aspectRatio: '1/1',
+        }}>
+        <img 
+          src="/spidey2.png" 
+          alt="Spidey 2"
+          className="w-full h-full object-contain"
+          style={{
+            filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.5))',
+          }}
+        />
+      </div>
+
+      {/* Spidey1 - Bottom Right Corner */}
+      <div className="absolute -bottom-4 -right-4 z-20 pointer-events-none"
+        style={{
+          width: 'clamp(220px, 30vw, 450px)',
+          height: 'auto',
+          aspectRatio: '1/1',
+        }}>
+        <img 
+          src="/spidey1.png" 
+          alt="Spidey 1"
+          className="w-full h-full object-contain"
+          style={{
+            filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.5))',
+          }}
+        />
+      </div>
 
       {phase === 'idle' && (
         <p className="relative z-10 text-pink-200/80 text-sm tracking-widest uppercase animate-pulse mb-3">
@@ -495,11 +568,11 @@ const CakeCut = ({ onDone }) => {
 
 // ── Gift Hub ───────────────────────────────────────────────────────────────────
 const PHOTOS = [
-  { src: 'https://picsum.photos/seed/ph1/200/200', rot: '-6deg', dy: 0 },
-  { src: 'https://picsum.photos/seed/ph2/200/200', rot: '4deg',  dy: 14 },
-  { src: 'https://picsum.photos/seed/ph3/200/200', rot: '-3deg', dy: 4 },
-  { src: 'https://picsum.photos/seed/ph4/200/200', rot: '6deg',  dy: 18 },
-  { src: 'https://picsum.photos/seed/ph5/200/200', rot: '-5deg', dy: 8 },
+  { src: '/img2.jpeg', rot: '-6deg', dy: 0 },
+  { src: '/img3.jpeg', rot: '4deg',  dy: 14 },
+  { src: '/img4.jpeg', rot: '-3deg', dy: 4 },
+  { src: '/img5.jpeg', rot: '6deg',  dy: 18 },
+  { src: '/img6.jpeg', rot: '-5deg', dy: 8 },
 ];
 
 const PhotoString = () => {
@@ -638,12 +711,15 @@ const GiftHub = ({ onSelect, bgAudioRef: externalBgAudioRef }) => {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden" style={{
-      backgroundImage: 'url(/spideybg.png)',
-      backgroundSize: 'contain',
-      backgroundPosition: 'center top',
+      backgroundImage: 'url(/spideybg2.png)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center center',
       backgroundRepeat: 'no-repeat',
       backgroundColor: '#1a0028'
     }}>
+      {/* Responsive background overlay for better text readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/40 pointer-events-none" />
+      
       <PhotoString />
       
       <div className="relative z-10 flex flex-col items-center justify-center flex-1 gap-4 p-6 pt-2">
@@ -717,6 +793,16 @@ const OurSongs = ({ onBack, bgAudioRef: externalBgAudioRef }) => {
   const [playing, setPlaying] = useState(false);
   const audioRef = useRef(null);
 
+  const SONGS_BG = {
+    style: {
+      backgroundImage: 'url(/musicbg.jpg)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center center',
+      backgroundRepeat: 'no-repeat',
+      backgroundColor: '#f48fb1'
+    }
+  };
+
   const song = songs[active];
 
   // Audio file paths - URL encoded to handle special characters in filenames
@@ -757,36 +843,41 @@ const OurSongs = ({ onBack, bgAudioRef: externalBgAudioRef }) => {
         setPlaying(false);
         // Resume background music
         if (externalBgAudioRef?.current) {
+          externalBgAudioRef.current.volume = 0.15; // Increased volume
           externalBgAudioRef.current.play().catch(() => {});
         }
       } else {
         // Ensure audio source is set
-        if (!audioRef.current.src || audioRef.current.src === '') {
+        if (!audioRef.current.src || audioRef.current.src === "") {
           audioRef.current.src = encodePath(audioFiles[active]);
           audioRef.current.load();
         }
-        console.log('Attempting to play:', audioRef.current.src);
+        console.log("Attempting to play:", audioRef.current.src);
         // Pause background music
         if (externalBgAudioRef?.current) {
           externalBgAudioRef.current.pause();
         }
+        audioRef.current.volume = 0.15; // Increased volume for current song
         await audioRef.current.play();
         setPlaying(true);
       }
     } catch (error) {
-      console.error('Playback failed:', error);
-      console.log('Audio source:', audioRef.current.src);
+      console.error("Playback failed:", error);
+      console.log("Audio source:", audioRef.current.src);
       // Show error message to user
-      alert('Could not play audio. The file may be missing or in an unsupported format. Check that song files exist in the public/songs folder.');
+      alert("Could not play audio. The file may be missing or in an unsupported format. Check that song files exist in the public/songs folder.");
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-6" {...BG}>
-      <h1 className="text-white text-3xl font-bold">{header}</h1>
-      <p className="text-pink-200">{subtext}</p>
+    <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-6 relative overflow-hidden" {...SONGS_BG}>
+      {/* Background overlay for text legibility */}
+      <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+      
+      <h1 className="text-white text-3xl font-bold relative z-10">{header}</h1>
+      <p className="text-pink-200 relative z-10">{subtext}</p>
 
-      <div className="bg-white/10 backdrop-blur rounded-2xl p-6 w-full max-w-md shadow-xl songs-player">
+      <div className="bg-white/10 backdrop-blur rounded-2xl p-6 w-full max-w-md shadow-xl songs-player relative z-10">
         {/* Spinning Vinyl Record */}
         <div className="flex items-center justify-center mb-4">
           <div className={`relative ${playing ? 'animate-spin' : ''}`} style={playing ? {animationDuration:'2s'} : {}}>
@@ -833,7 +924,7 @@ const OurSongs = ({ onBack, bgAudioRef: externalBgAudioRef }) => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 w-full max-w-sm songs-list">
+      <div className="flex flex-col gap-2 w-full max-w-sm songs-list relative z-10">
         {songs.map((s, i) => (
           <button key={i} onClick={() => { setActive(i); setPlaying(false); }}
             className={`flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all ${
@@ -848,7 +939,7 @@ const OurSongs = ({ onBack, bgAudioRef: externalBgAudioRef }) => {
         ))}
       </div>
 
-      <button onClick={onBack} className="btn-secondary mt-2">← Back</button>
+      <button onClick={onBack} className="btn-secondary mt-2 relative z-10">← Back</button>
     </div>
   );
 };
@@ -992,7 +1083,8 @@ const SecretMessage = ({ onBack }) => {
   }, []);
 
   // Photo rotations for polaroid display
-  const photoRotations = ['-4deg', '5deg', '-3deg'];
+  const photoRotations = ['-4deg', '5deg', '-3deg', '3deg', '-5deg', '4deg'];
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-6 sm:gap-6 sm:p-8"
@@ -1025,7 +1117,7 @@ const SecretMessage = ({ onBack }) => {
         {/* ── LEFT SIDE: 3 large Polaroid photos arranged in staggered row ── */}
         <div className="relative flex flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 w-full lg:w-auto">
           {photos.map((src, i) => {
-            const vertOffsets = [0, 20, 8];
+            const vertOffsets = [0, 20, 8, 12, 4, 16];
             return (
               <div key={`photo-${i}`} className="secret-polaroid"
                 style={{
@@ -1146,58 +1238,300 @@ const SecretMessage = ({ onBack }) => {
 };
 
 // ── Compliment Garden ─────────────────────────────────────────────────────────
-const FLOWER_EMOJIS = ['🌸','🌼','🌷','🌺','🌹','🌻','🌸','🌼'];
+const FLOWER_TYPES = [
+  { emoji: '🌸', name: 'cherry blossom', size: 'large' },
+  { emoji: '🌼', name: 'daisy', size: 'medium' },
+  { emoji: '🌷', name: 'tulip', size: 'medium' },
+  { emoji: '🌺', name: 'hibiscus', size: 'large' },
+  { emoji: '🌹', name: 'rose', size: 'medium' },
+  { emoji: '🌻', name: 'sunflower', size: 'large' },
+  { emoji: '💐', name: 'bouquet', size: 'large' },
+  { emoji: '🪷', name: 'lotus', size: 'medium' },
+];
 
 const ComplimentGarden = ({ onBack }) => {
   const { header, subtext, compliments } = content.interactions.complimentGarden;
   const [flowers, setFlowers] = useState([]);
   const [index, setIndex] = useState(0);
+  const [showBouquet, setShowBouquet] = useState(false);
+  const [sparkles, setSparkles] = useState([]);
+
+  const createSparkle = (x, y) => {
+    const newSparkles = [];
+    for (let i = 0; i < 6; i++) {
+      newSparkles.push({
+        id: Date.now() + i,
+        x: x + (Math.random() - 0.5) * 60,
+        y: y + (Math.random() - 0.5) * 60,
+        emoji: ['✨', '💫', '⭐'][Math.floor(Math.random() * 3)],
+        delay: i * 0.05,
+      });
+    }
+    setSparkles(s => [...s, ...newSparkles]);
+    setTimeout(() => {
+      setSparkles(s => s.filter(sp => !newSparkles.find(ns => ns.id === sp.id)));
+    }, 1500);
+  };
 
   const bloom = (e) => {
     if (index >= compliments.length) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
+    
+    const flowerType = FLOWER_TYPES[index % FLOWER_TYPES.length];
+    
     setFlowers(f => [...f, {
       id: Date.now(),
       x, y,
-      emoji: FLOWER_EMOJIS[index % FLOWER_EMOJIS.length],
-      text: compliments[index]
+      emoji: flowerType.emoji,
+      text: compliments[index],
+      size: flowerType.size,
+      rotation: (Math.random() - 0.5) * 20,
+      scale: 0.8 + Math.random() * 0.4,
     }]);
+    
+    createSparkle(x, y);
     setIndex(i => i + 1);
   };
 
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-6" {...BG}>
-      <h1 className="text-white text-3xl font-bold">{header}</h1>
-      <p className="text-pink-200 text-sm">{subtext}</p>
+  // Show bouquet image when garden is full
+  useEffect(() => {
+    if (index >= compliments.length && flowers.length > 0) {
+      setTimeout(() => setShowBouquet(true), 1200);
+    }
+  }, [index, flowers.length]);
 
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 sm:gap-5 p-4 sm:p-6 relative overflow-hidden" {...BG}>
+      {/* Animated background gradient */}
+      <div className="absolute inset-0 opacity-30 pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle at 20% 30%, rgba(255,182,193,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(255,218,185,0.3) 0%, transparent 50%)',
+          animation: 'bgPulse 8s ease-in-out infinite'
+        }}
+      />
+      
+      <style>{`
+        @keyframes bgPulse {
+          0%, 100% { opacity: 0.3; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.05); }
+        }
+        @keyframes flowerGrow {
+          0% { transform: scale(0) translateY(20px); opacity: 0; }
+          60% { transform: scale(1.2) translateY(-5px); opacity: 1; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        @keyframes sparkleBurst {
+          0% { transform: translate(0, 0) scale(0); opacity: 1; }
+          100% { transform: translate(var(--sx), var(--sy)) scale(1); opacity: 0; }
+        }
+        @keyframes gentleSway {
+          0%, 100% { transform: rotate(-2deg); }
+          50% { transform: rotate(2deg); }
+        }
+        .flower-grow {
+          animation: flowerGrow 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .sparkle-burst {
+          animation: sparkleBurst 1s ease-out forwards;
+        }
+        .gentle-sway {
+          animation: gentleSway 3s ease-in-out infinite;
+        }
+      `}</style>
+
+      <h1 className="text-white text-2xl sm:text-3xl font-bold text-center px-4 relative z-10"
+        style={{ textShadow: '0 2px 20px rgba(255,182,193,0.5)' }}>
+        {header}
+      </h1>
+      <p className="text-pink-100 text-xs sm:text-sm text-center px-4 relative z-10">{subtext}</p>
+
+      {/* Garden Container */}
       <div
         onClick={bloom}
-        className="relative w-full max-w-sm h-72 rounded-2xl bg-white/10 border-2 border-white/20 cursor-pointer overflow-hidden garden-area"
+        className="relative w-full max-w-md h-72 sm:h-80 md:h-96 rounded-3xl cursor-pointer overflow-hidden garden-area"
+        style={{
+          background: 'linear-gradient(180deg, rgba(255,182,193,0.15) 0%, rgba(255,218,185,0.1) 100%)',
+          border: '2px solid rgba(255,255,255,0.25)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.2), inset 0 2px 20px rgba(255,255,255,0.1)',
+        }}
       >
+        {/* Grass base */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-20"
+          style={{
+            background: 'linear-gradient(180deg, rgba(124,179,66,0.2) 0%, rgba(85,139,47,0.3) 100%)',
+            borderTop: '1px solid rgba(124,179,66,0.3)'
+          }}
+        />
+
+        {/* Floating particles background */}
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={`particle-${i}`}
+            className="absolute pointer-events-none text-xs"
+            style={{
+              left: `${10 + i * 12}%`,
+              top: `${15 + (i * 23) % 60}%`,
+              opacity: 0.3 + (i % 3) * 0.1,
+              animation: `float ${2.5 + i * 0.3}s ease-in-out infinite`,
+              animationDelay: `${i * 0.4}s`
+            }}>
+            {['✨', '💫', '🌸'][i % 3]}
+          </div>
+        ))}
+
         {flowers.length === 0 && (
-          <p className="absolute inset-0 flex items-center justify-center text-white/40 text-sm">Tap to bloom 🌸</p>
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="text-center animate-pulse">
+              <p className="text-white/50 text-sm sm:text-base mb-2">🌱 Tap to plant flowers</p>
+              <p className="text-white/30 text-xs">Each tap grows a unique bloom</p>
+            </div>
+          </div>
         )}
-        {flowers.map(f => (
-          <div key={f.id} className="absolute animate-fade-in flex flex-col items-center" style={{ left: f.x - 24, top: f.y - 24 }}>
-            <span className="text-3xl animate-float">{f.emoji}</span>
+
+        {/* Flowers */}
+        {flowers.map((f, i) => (
+          <div key={f.id}
+            className="absolute flower-grow"
+            style={{
+              left: `${f.x}px`,
+              top: `${f.y}px`,
+              transform: `translate(-50%, -50%) scale(${f.scale}) rotate(${f.rotation}deg)`,
+              animationDelay: `${i * 0.05}s`,
+              zIndex: flowers.length - i,
+            }}
+          >
+            {/* Flower glow */}
+            <div className="absolute inset-0 blur-xl opacity-40"
+              style={{
+                background: 'radial-gradient(circle, rgba(255,182,193,0.6) 0%, transparent 70%)',
+                transform: 'scale(1.5)'
+              }}
+            />
+            
+            {/* Flower emoji with sway */}
+            <div className="relative gentle-sway"
+              style={{ animationDelay: `${i * 0.2}s` }}>
+              <span className="text-3xl sm:text-4xl md:text-5xl filter drop-shadow-lg">
+                {f.emoji}
+              </span>
+            </div>
+
+            {/* Compliment text bubble */}
+            <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 whitespace-nowrap"
+              style={{
+                background: 'rgba(255,255,255,0.95)',
+                color: '#be0b33',
+                padding: '4px 12px',
+                borderRadius: '12px',
+                fontSize: '0.65rem',
+                fontWeight: '600',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+                fontFamily: 'Georgia, serif',
+                fontStyle: 'italic',
+                maxWidth: '150px',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}>
+              {f.text}
+            </div>
+          </div>
+        ))}
+
+        {/* Sparkles */}
+        {sparkles.map(sparkle => (
+          <div key={sparkle.id}
+            className="absolute pointer-events-none sparkle-burst text-sm"
+            style={{
+              left: `${sparkle.x}px`,
+              top: `${sparkle.y}px`,
+              '--sx': `${(Math.random() - 0.5) * 80}px`,
+              '--sy': `${(Math.random() - 0.5) * 80}px`,
+              animationDelay: `${sparkle.delay}s`,
+            }}>
+            {sparkle.emoji}
           </div>
         ))}
       </div>
 
+      {/* Last compliment display */}
       {flowers.length > 0 && (
-        <div className="bg-white/10 rounded-xl px-5 py-3 max-w-sm w-full text-center animate-fade-in">
-          <p className="text-white text-sm italic">{flowers[flowers.length - 1].text}</p>
+        <div className="bg-white/15 backdrop-blur-md rounded-2xl px-5 sm:px-6 py-3 sm:py-4 max-w-sm w-full text-center animate-fade-in border border-white/20"
+          style={{
+            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+          }}>
+          <p className="text-white text-xs sm:text-sm font-medium" style={{ fontFamily: 'Georgia, serif' }}>
+            {flowers[flowers.length - 1].text}
+          </p>
         </div>
       )}
 
-      {index >= compliments.length && (
-        <p className="text-pink-200 text-sm animate-fade-in">🌱 Your garden is in full bloom! 🌸</p>
+      {/* Progress indicator */}
+      {index < compliments.length && (
+        <div className="flex gap-1.5">
+          {compliments.map((_, i) => (
+            <div key={i}
+              className="h-1.5 rounded-full transition-all duration-300"
+              style={{
+                width: i < index ? '1.5rem' : '0.5rem',
+                background: i < index 
+                  ? 'linear-gradient(90deg, #f472b6, #fb7185)' 
+                  : 'rgba(255,255,255,0.2)',
+              }}
+            />
+          ))}
+        </div>
       )}
 
-      <button onClick={onBack} className="btn-secondary mt-2">← Back</button>
+      {index >= compliments.length && !showBouquet && (
+        <div className="animate-fade-in text-center px-4">
+          <p className="text-pink-100 text-sm sm:text-base font-medium mb-2">🌱 Your garden is in full bloom! 🌸</p>
+          <p className="text-white/60 text-xs">Preparing your special surprise...</p>
+        </div>
+      )}
 
+      {!showBouquet && (
+        <button onClick={onBack} className="btn-secondary mt-2 text-xs sm:text-sm">← Back</button>
+      )}
+
+      {/* Cat Bouquet Image - appears from center, covers everything */}
+      {showBouquet && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-fade-in p-4">
+          <div className="relative">
+            {/* Sparkle effects around image */}
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i}
+                className="absolute pointer-events-none text-2xl"
+                style={{
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                  animation: `float ${2 + i * 0.2}s ease-in-out infinite`,
+                  animationDelay: `${i * 0.15}s`,
+                }}>
+                {['✨', '💫', '💖'][i % 3]}
+              </div>
+            ))}
+            
+            <img
+              src="/cat_bouquet.png"
+              alt="Cat with bouquet"
+              className="w-full max-w-[65vw] sm:max-w-[60vw] h-auto object-contain animate-bounce-slow relative z-10"
+              style={{ 
+                maxHeight: '70vh',
+                filter: 'drop-shadow(0 20px 60px rgba(0,0,0,0.5))'
+              }}
+            />
+          </div>
+          
+          <button
+            onClick={onBack}
+            className="absolute bottom-8 sm:bottom-12 bg-white/90 hover:bg-white text-pink-600 font-bold px-6 sm:px-8 py-2 sm:py-3 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 text-sm sm:text-base z-20"
+            style={{ fontFamily: 'Georgia, serif' }}
+          >
+            ← Back
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -1207,7 +1541,13 @@ const TakeASelfie = ({ onBack }) => {
   const [photos, setPhotos] = useState([]);
   const [flashing, setFlashing] = useState(false);
   const [cameraReady, setCameraReady] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const [selfieIndex, setSelfieIndex] = useState(0);
   const audioRef = useRef(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Camera click sound effect
   useEffect(() => {
@@ -1248,24 +1588,54 @@ const TakeASelfie = ({ onBack }) => {
       audioRef.current.playClickSound();
     }
     
-    // Add new photo
+    // Add new photo with custom images in order
+    const selfieImages = ['/img7.jpeg', '/img8.jpeg', '/img9.jpeg', '/img10.jpeg', '/img11.jpeg'];
+    const customCaptions = [
+      'woah😲',
+      'wooah😮',
+      'woooah😧',
+      'wooooah🫨',
+      'woooooooaahhhh🫢🛐'
+    ];
     const newPhoto = {
       id: Date.now(),
-      src: `https://picsum.photos/seed/selfie${Date.now()}/200/200`,
+      src: selfieImages[selfieIndex],
+      caption: customCaptions[selfieIndex],
       timestamp: new Date().toLocaleTimeString()
     };
     
     setTimeout(() => {
       setPhotos(prev => [...prev, newPhoto]);
+      setSelfieIndex(prev => (prev + 1) % selfieImages.length);
       setFlashing(false);
       setCameraReady(true);
     }, 300);
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-6" {...BG}>
-      <h1 className="text-white text-3xl font-bold">📸 Take A Selfie</h1>
-      <p className="text-pink-200">Capture your special moments! ({photos.length}/5 photos)</p>
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 sm:gap-5 p-4 sm:p-6 relative overflow-hidden" {...BG}>
+      {/* Floating sparkles background */}
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div key={`sparkle-${i}`}
+          className="absolute pointer-events-none text-sm"
+          style={{
+            left: `${10 + i * 12}%`,
+            top: `${15 + (i * 17) % 70}%`,
+            opacity: 0.2 + (i % 3) * 0.1,
+            animation: `float ${2.5 + i * 0.3}s ease-in-out infinite`,
+            animationDelay: `${i * 0.4}s`
+          }}>
+          ✨
+        </div>
+      ))}
+
+      <div className="relative z-10 text-center">
+        <h1 className="text-white text-2xl sm:text-3xl font-bold mb-2"
+          style={{ textShadow: '0 2px 20px rgba(255,182,193,0.5)' }}>
+          📸 Take A Selfie
+        </h1>
+        <p className="text-pink-100 text-xs sm:text-sm">Capture your special moments! ({photos.length}/5 photos)</p>
+      </div>
 
       {/* Camera Flash Overlay */}
       {flashing && (
@@ -1273,66 +1643,67 @@ const TakeASelfie = ({ onBack }) => {
       )}
 
       {/* Camera */}
-      <div className="relative">
-        {/* Camera Body */}
-        <div className="relative bg-gray-800 rounded-xl p-3 shadow-2xl camera-body" 
+      <div className="relative z-10">
+        <div className="relative bg-gradient-to-br from-gray-700 to-gray-900 rounded-3xl p-6 shadow-2xl"
           style={{ 
-            width: 180, 
-            height: 180,
-            boxShadow: '0 10px 40px rgba(0,0,0,0.4), 0 0 25px rgba(255,184,107,0.2)'
+            width: 220, 
+            height: 220,
+            boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(255,184,107,0.15)',
+            border: '3px solid #4a4a4a',
+            transform: 'rotate(-1deg)'
           }}>
           
           {/* Camera Lens */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="relative">
               {/* Outer lens ring */}
-              <div className="w-28 h-28 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center camera-lens-outer"
+              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center"
                 style={{ 
-                  boxShadow: 'inset 0 3px 10px rgba(0,0,0,0.6), 0 0 15px rgba(0,0,0,0.4)',
-                  border: '2px solid #4a4a4a'
+                  boxShadow: 'inset 0 4px 15px rgba(0,0,0,0.7), 0 0 20px rgba(0,0,0,0.5)',
+                  border: '3px solid #3a3a3a'
                 }}>
                 {/* Inner lens */}
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-900 to-black flex items-center justify-center camera-lens-inner"
+                <div className="w-28 h-28 rounded-full bg-gradient-to-br from-blue-900 via-purple-900 to-black flex items-center justify-center"
                   style={{ 
-                    boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.8)',
-                    border: '2px solid #2a2a2a'
+                    boxShadow: 'inset 0 3px 10px rgba(0,0,0,0.9)',
+                    border: '2px solid #1a1a1a'
                   }}>
                   {/* Lens glass */}
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-800 via-purple-900 to-black relative overflow-hidden camera-lens-glass"
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-800 via-purple-900 to-black relative overflow-hidden"
                     style={{ 
-                      boxShadow: 'inset 0 0 15px rgba(0,0,0,0.9)',
-                      border: '1px solid #1a1a1a'
+                      boxShadow: 'inset 0 0 20px rgba(0,0,0,1)',
+                      border: '1px solid #0a0a0a'
                     }}>
                     {/* Lens reflection */}
-                    <div className="absolute top-2 left-3 w-5 h-5 bg-white opacity-10 rounded-full blur-sm" />
-                    <div className="absolute bottom-5 right-5 w-2 h-2 bg-white opacity-5 rounded-full blur-sm" />
+                    <div className="absolute top-3 left-4 w-6 h-6 bg-white opacity-15 rounded-full blur-sm" />
+                    <div className="absolute bottom-6 right-6 w-3 h-3 bg-white opacity-10 rounded-full blur-sm" />
                   </div>
                 </div>
               </div>
               
               {/* Camera flash light */}
-              <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-10 h-2.5 bg-yellow-100 rounded-full opacity-80"
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-12 h-3 bg-gradient-to-b from-yellow-100 to-yellow-200 rounded-full opacity-90"
                 style={{ 
-                  boxShadow: '0 0 15px rgba(255,255,200,0.6)',
+                  boxShadow: '0 0 20px rgba(255,255,200,0.8)',
                   border: '1px solid #ffd700'
                 }} />
             </div>
           </div>
 
           {/* Camera brand label */}
-          <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
-            <div className="text-gray-400 text-xs font-bold tracking-widest">CAMERA</div>
+          <div className="absolute top-3 left-1/2 transform -translate-x-1/2">
+            <div className="text-gray-300 text-xs font-bold tracking-widest">CAMERA</div>
           </div>
 
           {/* Shutter button on top */}
-          <div className="absolute -top-2.5 right-5 w-5 h-5 bg-gray-700 rounded-full border-2 border-gray-600"
-            style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.3)' }} />
+          <div className="absolute -top-3 right-6 w-6 h-6 bg-gray-600 rounded-full border-2 border-gray-500"
+            style={{ boxShadow: '0 3px 8px rgba(0,0,0,0.4)' }} />
         </div>
 
         {/* Photo coming out animation */}
         {flashing && (
-          <div className="absolute -bottom-20 left-1/2 transform -translate-x-1/2 animate-photoEject">
-            <div className="bg-white p-2 rounded shadow-lg" style={{ width: 140, height: 140 }}>
+          <div className="absolute -bottom-24 left-1/2 transform -translate-x-1/2 animate-photoEject">
+            <div className="bg-white p-2 rounded-lg shadow-xl" style={{ width: 150, height: 150 }}>
               <img 
                 src={`https://picsum.photos/seed/selfie${Date.now()}/200/200`}
                 alt="captured"
@@ -1343,47 +1714,47 @@ const TakeASelfie = ({ onBack }) => {
         )}
       </div>
 
-      {/* Click Button */}
+      {/* Shutter Button */}
       <button
         onClick={takePhoto}
         disabled={!cameraReady || photos.length >= 5}
         className="relative group"
       >
-        <div className="w-16 h-16 rounded-full bg-white border-4 border-gray-300 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+        <div className="w-20 h-20 rounded-full bg-white border-4 border-gray-300 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ 
-            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+            boxShadow: '0 6px 24px rgba(0,0,0,0.4), 0 0 0 3px rgba(255,255,255,0.2)',
           }}>
-          <div className="w-11 h-11 rounded-full bg-red-500 group-hover:bg-red-600 transition-colors" />
+          <div className="w-14 h-14 rounded-full bg-red-500 group-hover:bg-red-600 transition-colors"
+            style={{ boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.3)' }} />
         </div>
       </button>
 
       {/* Captured Photos Gallery */}
       {photos.length > 0 && (
-        <div className="w-full">
-          <div className="text-white text-sm mb-3 text-center">Your Photos ✨</div>
-          <div className="flex flex-row justify-center items-end gap-4 overflow-x-auto pb-4">
+        <div className="w-full max-w-md">
+          <div className="text-white text-sm mb-3 text-center font-semibold">Your Photos ✨</div>
+          <div className="flex flex-row justify-center items-end gap-3 overflow-x-auto pb-4">
             {photos.map((photo, index) => (
               <div
                 key={photo.id}
                 className="animate-photoAppear flex-shrink-0"
                 style={{ 
                   animationDelay: `${index * 0.1}s`,
-                  transform: `rotate(${(index % 2 === 0 ? -1 : 1) * (2 + index)}deg)`
+                  transform: `rotate(${(index % 2 === 0 ? -1 : 1) * (3 + index)}deg)`
                 }}
               >
-                <div className="bg-white p-4 pb-10 shadow-lg relative selfie-photo-card"
+                <div className="bg-white p-3 pb-12 shadow-lg relative"
                   style={{ 
-                    width: 200, 
-                    transform: 'rotate(-2deg)',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
+                    width: 180, 
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.4)'
                   }}>
                   <img 
                     src={photo.src} 
                     alt={`selfie ${index + 1}`}
-                    className="w-full h-40 object-cover"
+                    className="w-full h-36 object-cover"
                   />
-                  <div className="absolute bottom-1 left-0 right-0 text-center text-xs text-gray-500">
-                    {photo.timestamp}
+                  <div className="absolute bottom-1 left-0 right-0 text-center text-xs text-pink-600 font-bold px-1 select-text">
+                    {photo.caption}
                   </div>
                 </div>
               </div>
@@ -1393,7 +1764,7 @@ const TakeASelfie = ({ onBack }) => {
       )}
 
       {/* Back Button */}
-      <button onClick={onBack} className="btn-secondary mt-4">← Back</button>
+      <button onClick={onBack} className="btn-secondary mt-2 text-xs sm:text-sm">← Back</button>
 
       {/* Hidden audio element for sound effects */}
       <audio ref={audioRef} />
@@ -1404,31 +1775,158 @@ const TakeASelfie = ({ onBack }) => {
 // ── Love Letter ────────────────────────────────────────────────────────────────
 const LoveLetter = ({ onBack }) => {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { header, note } = content.interactions.loveLetter;
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-6" {...BG}>
-      <h1 className="text-white text-3xl font-bold">{header}</h1>
+    <div className="min-h-screen flex flex-col items-center justify-center gap-4 sm:gap-5 p-4 sm:p-6 relative overflow-hidden" {...BG}>
+      {/* Floating hearts background */}
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div key={`heart-${i}`}
+          className="absolute pointer-events-none"
+          style={{
+            left: `${10 + i * 12}%`,
+            top: `${10 + (i * 17) % 80}%`,
+            fontSize: `${12 + (i % 3) * 8}px`,
+            opacity: 0.15 + (i % 3) * 0.05,
+            animation: `float ${3 + i * 0.3}s ease-in-out infinite`,
+            animationDelay: `${i * 0.4}s`
+          }}>
+          💌
+        </div>
+      ))}
+
+      <div className="relative z-10 text-center">
+        <h1 className="text-white text-2xl sm:text-3xl font-bold mb-2"
+          style={{ textShadow: '0 2px 20px rgba(255,182,193,0.5)' }}>
+          {header}
+        </h1>
+        <p className="text-pink-100 text-xs sm:text-sm">A special message just for you 💕</p>
+      </div>
 
       {!open ? (
-        <div className="flex flex-col items-center gap-4">
-          <div className="envelope cursor-pointer hover:scale-105 transition-transform" onClick={() => setOpen(true)}>
-            <div className="envelope-flap" />
-            <div className="envelope-body">
-              <div className="text-4xl">💌</div>
+        <div className="relative z-10 flex flex-col items-center gap-6">
+          {/* Envelope with premium styling */}
+          <div 
+            className="relative cursor-pointer group"
+            onClick={() => setOpen(true)}
+            style={{
+              animation: mounted ? 'envelopeFloat 3s ease-in-out infinite' : 'none'
+            }}>
+            {/* Sparkles around envelope */}
+            <div className="absolute -top-4 -left-4 text-2xl animate-float" style={{ animationDelay: '0s' }}>✨</div>
+            <div className="absolute -top-2 -right-6 text-xl animate-float" style={{ animationDelay: '0.3s' }}>💫</div>
+            <div className="absolute -bottom-4 -left-6 text-xl animate-float" style={{ animationDelay: '0.6s' }}>🩷</div>
+            <div className="absolute -bottom-2 -right-4 text-2xl animate-float" style={{ animationDelay: '0.9s' }}>✨</div>
+            
+            <div className="relative bg-gradient-to-br from-pink-100 to-pink-200 rounded-2xl p-8 shadow-2xl"
+              style={{
+                width: 280,
+                height: 180,
+                boxShadow: '0 20px 60px rgba(0,0,0,0.3), 0 0 40px rgba(233,30,140,0.2)',
+                border: '2px solid rgba(255,255,255,0.3)',
+                transform: 'rotate(-2deg)',
+                transition: 'transform 0.3s ease'
+              }}>
+              {/* Envelope flap */}
+              <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-pink-150 to-pink-100 rounded-t-2xl"
+                style={{
+                  clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
+                  background: 'linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%)'
+                }} />
+              
+              {/* Heart seal */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-5xl z-10"
+                style={{
+                  filter: 'drop-shadow(0 4px 12px rgba(233,30,140,0.4))',
+                  animation: 'heartSealPulse 2s ease-in-out infinite'
+                }}>
+                💖
+              </div>
             </div>
           </div>
-          <p className="text-pink-200 animate-pulse">Click to open 💕</p>
+
+          <button 
+            onClick={() => setOpen(true)}
+            className="group relative px-8 py-3 rounded-full font-bold text-sm tracking-widest transition-all duration-200 hover:scale-105 active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, #e91e8c, #f472b6)',
+              color: '#fff',
+              boxShadow: '0 4px 20px rgba(233,30,140,0.35)',
+              fontFamily: 'Georgia, serif'
+            }}>
+            <span className="relative z-10">Open Letter 💌</span>
+          </button>
         </div>
       ) : (
-        <div className="letter-paper animate-fade-in max-w-md w-full">
-          <div className="text-2xl text-center mb-4">💌</div>
-          <pre className="whitespace-pre-wrap text-gray-700 font-serif text-sm leading-relaxed">{note}</pre>
-          <div className="text-center mt-4 text-xl">🌹</div>
-          <button onClick={onBack} className="btn-secondary mt-4">← Back</button>
+        <div className="relative z-10 w-full max-w-md animate-fade-in">
+          {/* Letter paper with premium styling */}
+          <div className="relative bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-8 sm:p-10 shadow-2xl"
+            style={{
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3), 0 0 40px rgba(255,182,193,0.2)',
+              border: '1px solid rgba(255,220,200,0.5)',
+              transform: 'rotate(1deg)'
+            }}>
+            
+            {/* Paper texture overlay */}
+            <div className="absolute inset-0 rounded-3xl opacity-20 pointer-events-none"
+              style={{
+                backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.02) 1px, rgba(0,0,0,0.02) 2px)'
+              }}
+            />
+
+            {/* Corner decorations */}
+            <div className="absolute top-4 left-4 text-2xl opacity-30">🌸</div>
+            <div className="absolute top-4 right-4 text-2xl opacity-30">🌷</div>
+            <div className="absolute bottom-4 left-4 text-2xl opacity-30">🌺</div>
+            <div className="absolute bottom-4 right-4 text-2xl opacity-30">🌸</div>
+
+            {/* Letter content */}
+            <div className="relative z-10">
+              <div className="text-center mb-6">
+                <div className="text-5xl mb-3 animate-float">💌</div>
+                <h2 className="text-2xl font-bold text-pink-600 mb-2"
+                  style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+                  My Dearest
+                </h2>
+                <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-pink-300 to-transparent mx-auto"></div>
+              </div>
+
+              <div className="text-gray-700 text-sm sm:text-base leading-relaxed whitespace-pre-wrap text-center"
+                style={{ fontFamily: 'Georgia, serif', lineHeight: 1.8 }}>
+                {note}
+              </div>
+
+              <div className="text-center mt-6">
+                <div className="inline-block">
+                  <div className="text-3xl mb-2">🌹</div>
+                  <p className="text-pink-600 font-semibold text-sm"
+                    style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+                    Forever yours 💕
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button 
+            onClick={onBack}
+            className="btn-secondary mt-6 text-xs sm:text-sm">
+            ← Back
+          </button>
         </div>
       )}
 
+      <style>{`
+        @keyframes envelopeFloat {
+          0%, 100% { transform: translateY(0) rotate(-2deg); }
+          50% { transform: translateY(-10px) rotate(-2deg); }
+        }
+      `}</style>
     </div>
   );
 };

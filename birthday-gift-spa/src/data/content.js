@@ -82,9 +82,12 @@ Happy Birthday, Devu 💞🤗!`,
       photos: [
         'https://picsum.photos/seed/secret1/400/500',
         'https://picsum.photos/seed/secret2/400/500',
-        'https://picsum.photos/seed/secret3/400/500'
+        'https://picsum.photos/seed/secret3/400/500',
+        '/img12.jpeg',
+        '/img13.jpeg',
+        '/img14.jpeg'
       ],
-      captions: ['Us being us 🌸', 'My favorite smile ✨', 'Always together 💕']
+      captions: ['Us being us 🌸', 'My favorite smile ✨', 'Always together 💕', 'Special moment 💫', 'Beautiful memories 🌺', 'Forever in my heart 💖']
     },
     complimentGarden: {
       header: '🌸 Your Compliment Garden',
