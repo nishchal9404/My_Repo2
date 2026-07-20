@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "birthday-gift-spa",
   "version": "1.0.0",
   "type": "module",
@@ -30,3 +31,27 @@
   "author": "Your Name",
   "license": "MIT"
 }
+=======
+  "name": "bday",
+  "version": "1.0.0",
+  "description": "Birthday Gift SPA",
+  "scripts": {
+    "dev": "cd birthday-gift-spa && npm run dev",
+    "build": "cd birthday-gift-spa && npm run build",
+    "start": "cd birthday-gift-spa && npm run dev",
+    "install:all": "cd birthday-gift-spa && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nishchal9404/My_Repo2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/nishchal9404/My_Repo2/issues"
+  },
+  "homepage": "https://github.com/nishchal9404/My_Repo2#readme"
+}
+>>>>>>> 8831e4412aa2dacaa13c959489f82253dbdb0bd3
