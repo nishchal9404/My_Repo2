@@ -1326,7 +1326,6 @@ const SecretMessage = ({ onBack }) => {
                 </div>
                 <div className="secret-polaroid-card">
                   <img src={src} alt={`memory ${i + 1}`} className="secret-polaroid-img" />
-                  <p className="secret-polaroid-caption">{captions[i]}</p>
                 </div>
               </div>
             );
