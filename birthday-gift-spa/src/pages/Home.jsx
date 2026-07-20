@@ -639,9 +639,10 @@ const GiftHub = ({ onSelect, bgAudioRef: externalBgAudioRef }) => {
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden" style={{
       backgroundImage: 'url(/spideybg.png)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
+      backgroundSize: 'contain',
+      backgroundPosition: 'center top',
+      backgroundRepeat: 'no-repeat',
+      backgroundColor: '#1a0028'
     }}>
       <PhotoString />
       
