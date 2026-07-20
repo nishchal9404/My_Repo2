@@ -173,39 +173,230 @@ const FairyLights = () => (
   </div>
 );
 
-const Balloons = () => (
-  <div className="balloons-container" aria-hidden>
-    {Array.from({ length: 28 }).map((_, i) => {
-      const colors = ['#ff6b9d','#ffd700','#7c3aed','#22d3ee','#f97316','#ec4899','#84cc16','#f43f5e','#06b6d4','#a855f7','#fb923c','#34d399','#f472b6','#818cf8','#facc15'];
-      const left = 2 + (i * 3.5) + (Math.sin(i * 2.3) * 2.5);
-      const delay = (i * 0.18) % 2.8;
-      const size = 32 + (i % 5) * 9;
-      const initialRot = `${-15 + (i % 3) * 10}deg`;
-      const midRot = `${-5 + (i % 4) * 5}deg`;
-      const finalRot = `${10 + (i % 3) * 8}deg`;
-      const swayDuration = `${4 + (i % 4) * 0.8}s`;
-      const swayDist = `${-15 + (i % 5) * 6}px`;
+const Balloons = () => {
+  const colors = [
+    { base: '#ff4d6d', dark: '#c71f37' }, // Ruby Red
+    { base: '#ff758f', dark: '#d93d59' }, // Pink Rose
+    { base: '#f72585', dark: '#b5179e' }, // Hot Magenta
+    { base: '#7209b7', dark: '#560bad' }, // Royal Purple
+    { base: '#4cc9f0', dark: '#4361ee' }, // Sky/Ocean
+    { base: '#ffd166', dark: '#f7a399' }, // Warm Gold
+    { base: '#f28482', dark: '#f28482' }, // Peach Coral
+    { base: '#ff9f1c', dark: '#e76f51' }, // Orange Sunset
+    { base: '#06d6a0', dark: '#00b4d8' }, // Mint Green
+  ];
 
-      return (
-        <div 
-          key={i} 
-          className="balloon" 
-          style={{
-            left: `${left}%`,
-            animationDelay: `${delay}s`,
-            '--bcolor': colors[i % colors.length],
-            '--bsize': `${size}px`,
-            '--initial-rot': initialRot,
-            '--mid-rot': midRot,
-            '--final-rot': finalRot,
-            '--sway-duration': swayDuration,
-            '--sway-dist': swayDist,
-          }} 
-        />
+  const createBalloonData = (id, staggered = false) => {
+    const colorPair = colors[Math.floor(Math.random() * colors.length)];
+    const size = 55 + Math.floor(Math.random() * 25); // 55px to 80px wide
+    const duration = 7 + Math.random() * 5; // 7s to 12s rise time
+    const left = 3 + Math.random() * 90; // 3% to 93%
+    const delay = staggered ? -(Math.random() * duration) : Math.random() * 2.5; // Staggered start or delayed start
+    const swayDist = 20 + Math.random() * 25; // 20px to 45px sway
+    const swayDuration = 2.5 + Math.random() * 2.5; // 2.5s to 5s sway
+    const type = Math.random() > 0.4 ? 'round' : 'heart'; // 60% round, 40% heart
+    return {
+      id,
+      color: colorPair.base,
+      darkColor: colorPair.dark,
+      size,
+      left,
+      duration,
+      delay,
+      swayDist,
+      swayDuration,
+      type,
+      popped: false
+    };
+  };
+
+  const [balloons, setBalloons] = useState([]);
+  const [particles, setParticles] = useState([]);
+
+  useEffect(() => {
+    // Generate 30 balloons, staggered in progress (negative delay) so they appear instantly
+    const initial = Array.from({ length: 30 }).map((_, i) => createBalloonData(i, true));
+    setBalloons(initial);
+  }, []);
+
+  // Update particles with requestAnimationFrame
+  useEffect(() => {
+    if (particles.length === 0) return;
+    let active = true;
+    let frameId;
+    const update = () => {
+      if (!active) return;
+      setParticles(prev => prev
+        .map(p => ({
+          ...p,
+          x: p.x + p.vx,
+          y: p.y + p.vy,
+          vy: p.vy + 0.12, // gravity
+          opacity: p.opacity - 0.025,
+        }))
+        .filter(p => p.opacity > 0)
       );
-    })}
-  </div>
-);
+      frameId = requestAnimationFrame(update);
+    };
+    frameId = requestAnimationFrame(update);
+    return () => {
+      active = false;
+      cancelAnimationFrame(frameId);
+    };
+  }, [particles.length]);
+
+  const playPopSound = () => {
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(380, audioContext.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(70, audioContext.currentTime + 0.08);
+      
+      gain.gain.setValueAtTime(0.25, audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
+      
+      osc.start(audioContext.currentTime);
+      osc.stop(audioContext.currentTime + 0.08);
+    } catch (e) {
+      console.log('AudioContext blocked or unsupported');
+    }
+  };
+
+  const triggerPopParticles = (x, y, color) => {
+    const chars = ['🌸', '✨', '🎈', '❤️', '💖', '⭐', '🍬'];
+    const newParticles = Array.from({ length: 14 }).map((_, i) => {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1.5 + Math.random() * 4.5;
+      return {
+        id: `${Date.now()}-${i}-${Math.random()}`,
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 1.5,
+        color,
+        opacity: 1,
+        char: chars[Math.floor(Math.random() * chars.length)]
+      };
+    });
+    setParticles(prev => [...prev, ...newParticles]);
+  };
+
+  const handlePop = (id, e) => {
+    e.stopPropagation();
+    playPopSound();
+    
+    // Get click coordinates
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 3;
+
+    // Find the balloon color
+    const b = balloons.find(x => x.id === id);
+    if (b) {
+      triggerPopParticles(x, y, b.color);
+    }
+
+    setBalloons(prev => prev.map(x => x.id === id ? { ...x, popped: true } : x));
+  };
+
+  const handleIteration = (id) => {
+    // When a balloon animation iteration completes, we reset it as a fresh balloon
+    setBalloons(prev => prev.map(x => x.id === id ? createBalloonData(id, false) : x));
+  };
+
+  return (
+    <>
+      <div className="balloons-container" aria-hidden>
+        {balloons.map((b) => (
+          <div 
+            key={b.id} 
+            className="balloon-rise" 
+            style={{
+              left: `${b.left}%`,
+              animationDuration: `${b.duration}s`,
+              animationDelay: `${b.delay}s`,
+              opacity: b.popped ? 0 : 1,
+              pointerEvents: b.popped ? 'none' : 'auto',
+              '--sway-dist': `${b.swayDist}px`
+            }} 
+            onAnimationIteration={() => handleIteration(b.id)}
+          >
+            <div 
+              className="balloon-sway"
+              style={{
+                animationDuration: `${b.swayDuration}s`
+              }}
+            >
+              <div 
+                className="balloon-interactive hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer"
+                style={{
+                  width: b.size,
+                  height: b.size * 1.35
+                }}
+                onClick={(e) => handlePop(b.id, e)}
+              >
+                {b.type === 'round' ? (
+                  <svg viewBox="0 0 100 130" width="100%" height="100%">
+                    <defs>
+                      <radialGradient id={`balloon-grad-${b.id}`} cx="35%" cy="30%" r="55%">
+                        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.8"/>
+                        <stop offset="35%" stopColor={b.color}/>
+                        <stop offset="100%" stopColor={b.darkColor}/>
+                      </radialGradient>
+                    </defs>
+                    <path d="M 50 10 C 20 10 10 40 10 70 C 10 95 30 110 50 110 C 70 110 90 95 90 70 C 90 40 80 10 50 10 Z" fill={`url(#balloon-grad-${b.id})`} />
+                    <ellipse cx="32" cy="35" rx="6" ry="12" fill="#ffffff" opacity="0.45" transform="rotate(-25 32 35)"/>
+                    <polygon points="46,110 54,110 50,118" fill={b.darkColor} />
+                    <path d="M 50 118 Q 45 128, 50 138 T 50 158" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" fill="none"/>
+                  </svg>
+                ) : (
+                  <svg viewBox="0 0 100 130" width="100%" height="100%">
+                    <defs>
+                      <radialGradient id={`heart-grad-${b.id}`} cx="35%" cy="35%" r="55%">
+                        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.8"/>
+                        <stop offset="35%" stopColor={b.color}/>
+                        <stop offset="100%" stopColor={b.darkColor}/>
+                      </radialGradient>
+                    </defs>
+                    <path d="M 50 105 C 50 105 10 75 10 45 C 10 20 30 10 50 35 C 70 10 90 20 90 45 C 90 75 50 105 50 105 Z" fill={`url(#heart-grad-${b.id})`} />
+                    <path d="M 22 35 A 8 18 0 0 1 34 22" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.45" />
+                    <polygon points="46,105 54,105 50,113" fill={b.darkColor} />
+                    <path d="M 50 113 Q 55 123, 50 133 T 50 153" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" fill="none"/>
+                  </svg>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* Pop particles layer */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 35 }}>
+        {particles.map(p => (
+          <div
+            key={p.id}
+            className="absolute select-none text-xl"
+            style={{
+              left: p.x,
+              top: p.y,
+              opacity: p.opacity,
+              transform: `translate(-50%, -50%) scale(${p.opacity * 1.25})`,
+              zIndex: 35
+            }}
+          >
+            {p.char}
+          </div>
+        ))}
+      </div>
+    </>
+  );
+};
 
 const StagePrep = ({ onCurtain, bgAudioRef }) => {
   const [step, setStep] = useState(0);
@@ -1576,6 +1767,15 @@ const TakeASelfie = ({ onBack }) => {
     }
   }, []);
 
+  const selfieImages = ['/img7.jpeg', '/img8.jpeg', '/img9.jpeg', '/img10.jpeg', '/img11.jpeg'];
+  const customCaptions = [
+    'woah😲',
+    'wooah😮',
+    'woooah😧',
+    'wooooah🫨',
+    'woooooooaahhhh🫢🛐'
+  ];
+
   const takePhoto = () => {
     if (photos.length >= 5 || !cameraReady) return;
     
@@ -1589,14 +1789,6 @@ const TakeASelfie = ({ onBack }) => {
     }
     
     // Add new photo with custom images in order
-    const selfieImages = ['/img7.jpeg', '/img8.jpeg', '/img9.jpeg', '/img10.jpeg', '/img11.jpeg'];
-    const customCaptions = [
-      'woah😲',
-      'wooah😮',
-      'woooah😧',
-      'wooooah🫨',
-      'woooooooaahhhh🫢🛐'
-    ];
     const newPhoto = {
       id: Date.now(),
       src: selfieImages[selfieIndex],
@@ -1705,7 +1897,7 @@ const TakeASelfie = ({ onBack }) => {
           <div className="absolute -bottom-24 left-1/2 transform -translate-x-1/2 animate-photoEject">
             <div className="bg-white p-2 rounded-lg shadow-xl" style={{ width: 150, height: 150 }}>
               <img 
-                src={`https://picsum.photos/seed/selfie${Date.now()}/200/200`}
+                src={selfieImages[selfieIndex]}
                 alt="captured"
                 className="w-full h-full object-cover rounded"
               />

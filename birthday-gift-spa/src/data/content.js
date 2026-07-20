@@ -29,11 +29,11 @@ const content = {
       header: '📷 Our Memories',
       subtext: 'A little scrapbook just for you 💕',
       photos: [
-        'https://picsum.photos/seed/girl1/400/400',
-        'https://picsum.photos/seed/girl2/300/300',
-        'https://picsum.photos/seed/girl3/300/300',
-        'https://picsum.photos/seed/girl4/300/300',
-        'https://picsum.photos/seed/girl5/300/300'
+        '/img2.jpeg',
+        '/img3.jpeg',
+        '/img4.jpeg',
+        '/img5.jpeg',
+        '/img6.jpeg'
       ],
       captions: ['Us 🌸', 'Always smiling ✨', 'My fav 💕', 'Forever us 💖', 'Best day 🎀']
     },
@@ -80,14 +80,11 @@ const content = {
 Thank you for being the kind of person who turns ordinary moments into unforgettable memories. Your kindness, laughter, and endless positivity make life so much brighter. I hope this year brings you as much happiness as you've brought into the lives of everyone around you. Never stop being the amazing person you are.
 Happy Birthday, Devu 💞🤗!`,
       photos: [
-        'https://picsum.photos/seed/secret1/400/500',
-        'https://picsum.photos/seed/secret2/400/500',
-        'https://picsum.photos/seed/secret3/400/500',
         '/img12.jpeg',
         '/img13.jpeg',
         '/img14.jpeg'
       ],
-      captions: ['Us being us 🌸', 'My favorite smile ✨', 'Always together 💕', 'Special moment 💫', 'Beautiful memories 🌺', 'Forever in my heart 💖']
+      captions: ['Special moment 💫', 'Beautiful memories 🌺', 'Forever in my heart 💖']
     },
     complimentGarden: {
       header: '🌸 Your Compliment Garden',
